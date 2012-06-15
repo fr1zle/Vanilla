@@ -28,7 +28,7 @@ package org.spout.vanilla.protocol.handler;
 
 import org.spout.api.entity.Entity;
 import org.spout.api.geo.discrete.Point;
-import org.spout.api.player.Player;
+import org.spout.api.player.PlayerController;
 import org.spout.api.protocol.MessageHandler;
 import org.spout.api.protocol.Session;
 
@@ -37,12 +37,12 @@ import org.spout.vanilla.protocol.msg.PlayerPositionMessage;
 
 public final class PlayerPositionMessageHandler extends MessageHandler<PlayerPositionMessage> {
 	@Override
-	public void handleServer(Session session, Player player, PlayerPositionMessage message) {
+	public void handleServer(Session session, PlayerController player, PlayerPositionMessage message) {
 		if (player == null) {
 			return;
 		}
 
-		Entity entity = player.getEntity();
+		Entity entity = player.getParent();
 
 		if (entity == null) {
 			return;
@@ -92,6 +92,6 @@ public final class PlayerPositionMessageHandler extends MessageHandler<PlayerPos
 		entity.setPosition(p);
 	}
 
-	public void handleClient(Session session, Player player, PlayerPositionLookMessage message) {
+	public void handleClient(Session session, PlayerController player, PlayerPositionLookMessage message) {
 	}
 }

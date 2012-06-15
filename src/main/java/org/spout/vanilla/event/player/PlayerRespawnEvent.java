@@ -33,7 +33,7 @@ import org.spout.api.event.HandlerList;
 import org.spout.api.event.entity.EntitySpawnEvent;
 import org.spout.api.exception.InvalidControllerException;
 import org.spout.api.geo.discrete.Point;
-import org.spout.api.player.Player;
+import org.spout.api.player.PlayerController;
 
 public class PlayerRespawnEvent extends EntitySpawnEvent {
 	private static HandlerList handlers = new HandlerList();
@@ -51,8 +51,8 @@ public class PlayerRespawnEvent extends EntitySpawnEvent {
 	 * Gets the player associated in this event.
 	 * @return The player of the event.
 	 */
-	public Player getPlayer() {
-		return (Player) getEntity();
+	public PlayerController getPlayer() {
+		return (PlayerController) getEntity();
 	}
 
 	/**

@@ -43,7 +43,7 @@ import org.spout.api.inventory.ItemStack;
 import org.spout.api.math.MathHelper;
 import org.spout.api.math.Quaternion;
 import org.spout.api.math.Vector3;
-import org.spout.api.player.Player;
+import org.spout.api.player.PlayerController;
 
 import org.spout.vanilla.configuration.VanillaConfiguration;
 import org.spout.vanilla.controller.VanillaActionController;
@@ -80,7 +80,7 @@ import static org.spout.vanilla.util.VanillaNetworkUtil.sendPacket;
  * Represents a player on a server with the VanillaPlugin; specific methods to Vanilla.
  */
 public class VanillaPlayer extends Human implements PlayerController {
-	protected final Player owner;
+	protected final PlayerController owner;
 	protected long unresponsiveTicks = VanillaConfiguration.PLAYER_TIMEOUT_TICKS.getInt(), lastPing = 0, lastUserList = 0, foodTimer = 0;
 	protected short count = 0, ping, hunger = 20;
 	protected float foodSaturation = 5.0f, exhaustion = 0.0f;
@@ -92,7 +92,7 @@ public class VanillaPlayer extends Human implements PlayerController {
 	protected GameMode gameMode;
 	protected int distanceMoved, miningDamagePeriod = VanillaConfiguration.PLAYER_SPEEDMINING_PREVENTION_PERIOD.getInt(),
 			miningDamageAllowance = VanillaConfiguration.PLAYER_SPEEDMINING_PREVENTION_ALLOWANCE.getInt();
-	protected final Set<Player> invisibleFor = new HashSet<Player>();
+	protected final Set<PlayerController> invisibleFor = new HashSet<PlayerController>();
 	protected Point compassTarget;
 	protected Vector3 lookingAt;
 	protected Point diggingPosition;
@@ -106,14 +106,14 @@ public class VanillaPlayer extends Human implements PlayerController {
 
 	/**
 	 * Constructs a new VanillaPlayer to use as a {@link PlayerController} for the given player.
-	 * @param the {@link Player} parent of the controller.
+	 * @param the {@link PlayerController} parent of the controller.
 	 * @param the {@link GameMode} of the player.
 	 */
-	public VanillaPlayer(Player p, GameMode gameMode) {
+	public VanillaPlayer(PlayerController p, GameMode gameMode) {
 		super(VanillaControllerTypes.PLAYER);
 		owner = p;
 		tabListName = owner.getName();
-		compassTarget = owner.getEntity().getWorld().getSpawnPoint().getPosition();
+		compassTarget = owner.getParent().getWorld().getSpawnPoint().getPosition();
 		this.setHeadHeight(1.62f);
 		this.gameMode = gameMode;
 		miningDamage = new int[miningDamagePeriod];
@@ -121,9 +121,9 @@ public class VanillaPlayer extends Human implements PlayerController {
 
 	/**
 	 * Constructs a new VanillaPlayer to use as a {@link PlayerController} for the given player.
-	 * @param the {@link Player} parent of the controller.
+	 * @param the {@link PlayerController} parent of the controller.
 	 */
-	public VanillaPlayer(Player p) {
+	public VanillaPlayer(PlayerController p) {
 		this(p, GameMode.SURVIVAL);
 	}
 
@@ -151,7 +151,7 @@ public class VanillaPlayer extends Human implements PlayerController {
 		super.onTick(dt);
 		if(playerDead) return;
 		
-		Player player = getPlayer();
+		PlayerController player = getPlayer();
 		if (player == null || player.getSession() == null) {
 			return;
 		}
@@ -323,7 +323,7 @@ public class VanillaPlayer extends Human implements PlayerController {
 	}
 
 	@Override
-	public Player getPlayer() {
+	public PlayerController getPlayer() {
 		return owner;
 	}
 
@@ -386,13 +386,13 @@ public class VanillaPlayer extends Human implements PlayerController {
 	 * @param visible
 	 * @param players
 	 */
-	public void setVisibleFor(boolean visible, Player... players) {
+	public void setVisibleFor(boolean visible, PlayerController... players) {
 		Entity parent = getParent();
-		for (Player player : players) {
-			if (player.getEntity().getController() != this) {
+		for (PlayerController player : players) {
+			if (player.getParent().getController() != this) {
 				if (visible) {
 					invisibleFor.remove(player);
-					ItemStack currentItem = VanillaPlayerUtil.getCurrentItem(player.getEntity());
+					ItemStack currentItem = VanillaPlayerUtil.getCurrentItem(player.getParent());
 					int itemId = 0;
 					if (currentItem != null) {
 						itemId = currentItem.getMaterial().getId();
@@ -420,7 +420,7 @@ public class VanillaPlayer extends Human implements PlayerController {
 	 * @param player
 	 * @return true if visible for that player
 	 */
-	public boolean isVisibleFor(Player player) {
+	public boolean isVisibleFor(PlayerController player) {
 		return !invisibleFor.contains(player);
 	}
 
@@ -641,7 +641,7 @@ public class VanillaPlayer extends Human implements PlayerController {
 	 * @return true if successful
 	 */
 	public boolean startDigging(Point position) {
-		if (owner.getEntity().getPosition().getDistance(position) > 6) { // TODO: Actually get block reach from somewhere instead of just using 6
+		if (owner.getParent().getPosition().getDistance(position) > 6) { // TODO: Actually get block reach from somewhere instead of just using 6
 			return false;
 		}
 		isDigging = true;
@@ -759,7 +759,7 @@ public class VanillaPlayer extends Human implements PlayerController {
 	 * @return true if already active
 	 */
 	public boolean addEffect(Effect effect) {
-		owner.getSession().send(new EntityEffectMessage(owner.getEntity().getId(), effect.getType().getId(), effect.getStrength(), effect.getDuration()));
+		owner.getSession().send(new EntityEffectMessage(owner.getParent().getId(), effect.getType().getId(), effect.getStrength(), effect.getDuration()));
 		return effects.add(effect);
 	}
 
@@ -769,7 +769,7 @@ public class VanillaPlayer extends Human implements PlayerController {
 	 * @return true if effect is not active already
 	 */
 	public boolean removeEffect(Effect effect) {
-		owner.getSession().send(new EntityRemoveEffectMessage(owner.getEntity().getId(), effect.getType().getId()));
+		owner.getSession().send(new EntityRemoveEffectMessage(owner.getParent().getId(), effect.getType().getId()));
 		return effects.remove(effect);
 	}
 }

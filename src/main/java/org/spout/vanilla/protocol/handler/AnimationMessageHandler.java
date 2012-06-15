@@ -26,7 +26,7 @@
  */
 package org.spout.vanilla.protocol.handler;
 
-import org.spout.api.player.Player;
+import org.spout.api.player.PlayerController;
 import org.spout.api.protocol.MessageHandler;
 import org.spout.api.protocol.Session;
 
@@ -35,18 +35,18 @@ import org.spout.vanilla.protocol.msg.EntityActionMessage;
 
 public final class AnimationMessageHandler extends MessageHandler<AnimationMessage> {
 	@Override
-	public void handleServer(Session session, Player player, AnimationMessage message) {
-		if (player == null || player.getEntity() == null) {
+	public void handleServer(Session session, PlayerController player, AnimationMessage message) {
+		if (player == null || player.getParent() == null) {
 			return;
 		}
 
 		switch (message.getAnimation()) {
 			case AnimationMessage.ANIMATION_CROUCH:
-				session.send(new EntityActionMessage(player.getEntity().getId(), EntityActionMessage.ACTION_CROUCH));
+				session.send(new EntityActionMessage(player.getParent().getId(), EntityActionMessage.ACTION_CROUCH));
 				//TODO Set this in VanillaActionController as apparently any entity can crouch?
 				break;
 			case AnimationMessage.ANIMATION_UNCROUCH:
-				session.send(new EntityActionMessage(player.getEntity().getId(), EntityActionMessage.ACTION_UNCROUCH));
+				session.send(new EntityActionMessage(player.getParent().getId(), EntityActionMessage.ACTION_UNCROUCH));
 				//TODO Set this in VanillaActionController as apparently any entity can crouch?
 				break;
 			default:

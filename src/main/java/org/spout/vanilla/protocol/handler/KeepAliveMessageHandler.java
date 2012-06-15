@@ -26,7 +26,7 @@
  */
 package org.spout.vanilla.protocol.handler;
 
-import org.spout.api.player.Player;
+import org.spout.api.player.PlayerController;
 import org.spout.api.protocol.MessageHandler;
 import org.spout.api.protocol.Session;
 
@@ -35,12 +35,12 @@ import org.spout.vanilla.protocol.msg.KeepAliveMessage;
 
 public class KeepAliveMessageHandler extends MessageHandler<KeepAliveMessage> {
 	@Override
-	public void handleServer(Session session, Player player, KeepAliveMessage message) {
-		if (player == null || player.getEntity() == null || (!(player.getEntity().getController() instanceof VanillaPlayer))) {
+	public void handleServer(Session session, PlayerController player, KeepAliveMessage message) {
+		if (player == null || player.getParent() == null || (!(player.getParent().getController() instanceof VanillaPlayer))) {
 			return;
 		}
 
-		VanillaPlayer mp = (VanillaPlayer) player.getEntity().getController();
+		VanillaPlayer mp = (VanillaPlayer) player.getParent().getController();
 		mp.resetTimeoutTicks();
 	}
 }

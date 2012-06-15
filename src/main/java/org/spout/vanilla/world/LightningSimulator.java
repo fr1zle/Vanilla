@@ -34,7 +34,7 @@ import java.util.Random;
 import org.spout.api.geo.World;
 import org.spout.api.geo.discrete.Point;
 import org.spout.api.math.MathHelper;
-import org.spout.api.player.Player;
+import org.spout.api.player.PlayerController;
 
 import org.spout.vanilla.controller.object.misc.Lightning;
 import org.spout.vanilla.controller.world.VanillaSky;
@@ -43,7 +43,7 @@ public class LightningSimulator {
 	private static final int MAX_LIGHTNING_BRANCHES = 5;
 	private static Random ra = new Random();
 	final World world;
-	final HashMap<Player, Integer> playerCountdown = new HashMap<Player, Integer>();
+	final HashMap<PlayerController, Integer> playerCountdown = new HashMap<PlayerController, Integer>();
 	Intensity stormIntensity = null;
 
 	public LightningSimulator(World world) {
@@ -67,8 +67,8 @@ public class LightningSimulator {
 			if (stormIntensity == null) {
 				stormIntensity = Intensity.getRandomIntensity(ra);
 			}
-			List<Player> toStrike = new ArrayList<Player>();
-			for (Player player : world.getPlayers()) {
+			List<PlayerController> toStrike = new ArrayList<PlayerController>();
+			for (PlayerController player : world.getPlayers()) {
 				if (!player.isOnline()) {
 					return;
 				}
@@ -91,9 +91,9 @@ public class LightningSimulator {
 		}
 	}
 
-	public void strikePlayers(List<Player> toStrike) {
-		for (Player player : toStrike) {
-			Point playerPos = player.getEntity().getPosition();
+	public void strikePlayers(List<PlayerController> toStrike) {
+		for (PlayerController player : toStrike) {
+			Point playerPos = player.getParent().getPosition();
 			final int posX = MathHelper.floor(playerPos.getX());
 			final int posY = MathHelper.floor(playerPos.getY());
 			final int posZ = MathHelper.floor(playerPos.getZ());

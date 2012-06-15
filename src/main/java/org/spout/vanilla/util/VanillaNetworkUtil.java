@@ -33,7 +33,7 @@ import org.spout.api.Spout;
 import org.spout.api.entity.Entity;
 import org.spout.api.geo.cuboid.Block;
 import org.spout.api.geo.discrete.Point;
-import org.spout.api.player.Player;
+import org.spout.api.player.PlayerController;
 import org.spout.api.protocol.Message;
 
 import org.spout.vanilla.protocol.msg.BlockActionMessage;
@@ -54,8 +54,8 @@ public class VanillaNetworkUtil {
 	 * @param players specific players to send a message to.
 	 * @param messages the message(s) to send
 	 */
-	public static void sendPacket(Player[] players, Message... messages) {
-		for (Player player : players) {
+	public static void sendPacket(PlayerController[] players, Message... messages) {
+		for (PlayerController player : players) {
 			for (Message message : messages) {
 				sendPacket(player, message);
 			}
@@ -68,17 +68,17 @@ public class VanillaNetworkUtil {
 	 * @param ignore Players to ignore when sending messages
 	 * @param messages Messages to send
 	 */
-	public static void broadcastPacket(Player[] ignore, Message... messages) {
-		ArrayList<Player> toSend = new ArrayList<Player>();
-		for (Player player : Spout.getEngine().getOnlinePlayers()) {
-			for (Player ignored : ignore) {
+	public static void broadcastPacket(PlayerController[] ignore, Message... messages) {
+		ArrayList<PlayerController> toSend = new ArrayList<PlayerController>();
+		for (PlayerController player : Spout.getEngine().getOnlinePlayers()) {
+			for (PlayerController ignored : ignore) {
 				if (player.equals(ignored)) {
 					continue;
 				}
 				toSend.add(player);
 			}
 		}
-		sendPacket(toSend.toArray(new Player[toSend.size()]), messages);
+		sendPacket(toSend.toArray(new PlayerController[toSend.size()]), messages);
 	}
 
 	/**
@@ -86,7 +86,7 @@ public class VanillaNetworkUtil {
 	 * @param player specific player to relieve message
 	 * @param messages specific message to send.
 	 */
-	public static void sendPacket(Player player, Message... messages) {
+	public static void sendPacket(PlayerController player, Message... messages) {
 		for (Message message : messages) {
 			player.getSession().send(message);
 		}
@@ -143,8 +143,8 @@ public class VanillaNetworkUtil {
 	 * @param messages The messages that should be sent to the discovered nearest player.
 	 */
 	public static void sendPacketsToNearbyPlayers(Point position, Entity ignore, int range, Message... messages) {
-		Set<Player> players = position.getWorld().getNearbyPlayers(position, ignore, range);
-		for (Player plr : players) {
+		Set<PlayerController> players = position.getWorld().getNearbyPlayers(position, ignore, range);
+		for (PlayerController plr : players) {
 			plr.getSession().sendAll(messages);
 		}
 	}
@@ -156,8 +156,8 @@ public class VanillaNetworkUtil {
 	 * @param messages The messages that should be sent to the discovered nearest player.
 	 */
 	public static void sendPacketsToNearbyPlayers(Point position, int range, Message... messages) {
-		Set<Player> players = position.getWorld().getNearbyPlayers(position, range);
-		for (Player plr : players) {
+		Set<PlayerController> players = position.getWorld().getNearbyPlayers(position, range);
+		for (PlayerController plr : players) {
 			plr.getSession().sendAll(messages);
 		}
 	}
@@ -172,8 +172,8 @@ public class VanillaNetworkUtil {
 		if (entity == null || entity.getRegion() == null) {
 			return;
 		}
-		Set<Player> players = entity.getWorld().getNearbyPlayers(entity, range);
-		for (Player plr : players) {
+		Set<PlayerController> players = entity.getWorld().getNearbyPlayers(entity, range);
+		for (PlayerController plr : players) {
 			plr.getSession().sendAll(messages);
 		}
 	}
@@ -189,7 +189,7 @@ public class VanillaNetworkUtil {
 			return;
 		}
 
-		Player plr = entity.getWorld().getNearestPlayer(entity, range);
+		PlayerController plr = entity.getWorld().getNearestPlayer(entity, range);
 		//Only send if we have a player nearby.
 		if (plr != null) {
 			plr.getSession().sendAll(messages);

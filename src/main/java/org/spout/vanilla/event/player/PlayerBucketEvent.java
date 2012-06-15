@@ -32,7 +32,7 @@ import org.spout.api.event.player.PlayerEvent;
 import org.spout.api.geo.cuboid.Block;
 import org.spout.api.inventory.ItemStack;
 import org.spout.api.material.block.BlockFace;
-import org.spout.api.player.Player;
+import org.spout.api.player.PlayerController;
 
 public class PlayerBucketEvent extends PlayerEvent implements Cancellable {
 	private static HandlerList handlers = new HandlerList();
@@ -41,7 +41,7 @@ public class PlayerBucketEvent extends PlayerEvent implements Cancellable {
 	private BlockFace blockFace;
 	private boolean filled = false;
 
-	public PlayerBucketEvent(Player p, ItemStack bucket, Block blockClicked, BlockFace blockFace) {
+	public PlayerBucketEvent(PlayerController p, ItemStack bucket, Block blockClicked, BlockFace blockFace) {
 		super(p);
 		this.bucket = bucket;
 		this.blockClicked = blockClicked;

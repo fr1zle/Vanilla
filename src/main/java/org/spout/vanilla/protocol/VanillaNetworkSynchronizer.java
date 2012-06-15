@@ -41,7 +41,7 @@ import org.spout.api.inventory.InventoryBase;
 import org.spout.api.inventory.ItemStack;
 import org.spout.api.material.BlockMaterial;
 import org.spout.api.math.Quaternion;
-import org.spout.api.player.Player;
+import org.spout.api.player.PlayerController;
 import org.spout.api.protocol.EntityProtocol;
 import org.spout.api.protocol.Message;
 import org.spout.api.protocol.NetworkSynchronizer;
@@ -107,10 +107,10 @@ public class VanillaNetworkSynchronizer extends NetworkSynchronizer implements P
 		}
 	}
 
-	public VanillaNetworkSynchronizer(Player player, Entity entity) {
+	public VanillaNetworkSynchronizer(PlayerController player, Entity entity) {
 		super(player, player.getSession(), entity);
 		registerProtocolEvents(this);
-		initChunk(player.getEntity().getPosition());
+		initChunk(player.getParent().getPosition());
 	}
 
 	@Override
@@ -289,8 +289,8 @@ public class VanillaNetworkSynchronizer extends NetworkSynchronizer implements P
 		//TODO Handle infinite height
 		if (first) {
 			first = false;
-			int entityId = owner.getEntity().getId();
-			VanillaPlayer vc = (VanillaPlayer) owner.getEntity().getController();
+			int entityId = owner.getParent().getId();
+			VanillaPlayer vc = (VanillaPlayer) owner.getParent().getController();
 			LoginRequestMessage idMsg = new LoginRequestMessage(entityId, owner.getName(), gamemode.getId(), dimension.getId(), difficulty.getId(), 256, session.getGame().getMaxPlayers(), worldType.getType());
 			owner.getSession().send(idMsg, true);
 			owner.getSession().setState(State.GAME);
@@ -403,7 +403,7 @@ public class VanillaNetworkSynchronizer extends NetworkSynchronizer implements P
 
 	@Override
 	public void onSlotSet(InventoryBase inventory, int slot, ItemStack item) {
-		Controller c = owner.getEntity().getController();
+		Controller c = owner.getParent().getController();
 		if (!(c instanceof VanillaPlayer)) {
 			return;
 		}
@@ -426,7 +426,7 @@ public class VanillaNetworkSynchronizer extends NetworkSynchronizer implements P
 
 	@Override
 	public void updateAll(InventoryBase inventory, ItemStack[] slots) {
-		Controller c = owner.getEntity().getController();
+		Controller c = owner.getParent().getController();
 		if (!(c instanceof VanillaPlayer)) {
 			return;
 		}

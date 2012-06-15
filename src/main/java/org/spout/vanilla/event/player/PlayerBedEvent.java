@@ -30,14 +30,14 @@ import org.spout.api.event.Cancellable;
 import org.spout.api.event.HandlerList;
 import org.spout.api.event.player.PlayerEvent;
 import org.spout.api.geo.cuboid.Block;
-import org.spout.api.player.Player;
+import org.spout.api.player.PlayerController;
 
 public class PlayerBedEvent extends PlayerEvent implements Cancellable {
 	private static HandlerList handlers = new HandlerList();
 	private Block bed;
 	private boolean entered;
 
-	public PlayerBedEvent(Player p, Block bed) {
+	public PlayerBedEvent(PlayerController p, Block bed) {
 		super(p);
 		this.bed = bed;
 		entered = false;

@@ -30,8 +30,9 @@ import java.util.HashMap;
 import java.util.Random;
 
 import org.spout.api.entity.component.Controller;
+import org.spout.api.entity.component.controller.BasicController;
 import org.spout.api.geo.World;
-import org.spout.api.player.Player;
+import org.spout.api.player.PlayerController;
 import org.spout.api.protocol.Message;
 
 import org.spout.vanilla.controller.VanillaController;
@@ -42,7 +43,7 @@ import org.spout.vanilla.world.Weather;
 /**
  * Represents a sky in Vanilla
  */
-public abstract class VanillaSky extends Controller implements VanillaController {
+public abstract class VanillaSky extends BasicController implements VanillaController {
 	protected long maxTime, time = 0, countdown = 20, rate;
 	protected boolean hasWeather, forceWeatherUpdate = false;
 	protected Weather weather = Weather.CLEAR, forecast = Weather.CLEAR;
@@ -77,11 +78,11 @@ public abstract class VanillaSky extends Controller implements VanillaController
 	}
 
 	public void broadcastMessage(Message message) {
-		for (Player player : world.getPlayers()) {
+		for (PlayerController player : world.getPlayers()) {
 			if (!player.isOnline()) {
 				continue;
 			}
-			if (!player.getEntity().getWorld().getName().equals(world.getName())) {
+			if (!player.getParent().getWorld().getName().equals(world.getName())) {
 				continue;
 			}
 			player.getSession().send(message);

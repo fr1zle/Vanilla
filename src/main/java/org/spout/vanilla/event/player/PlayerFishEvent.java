@@ -30,20 +30,20 @@ import org.spout.api.entity.component.Controller;
 import org.spout.api.event.Cancellable;
 import org.spout.api.event.HandlerList;
 import org.spout.api.event.player.PlayerEvent;
-import org.spout.api.player.Player;
+import org.spout.api.player.PlayerController;
 
 public class PlayerFishEvent extends PlayerEvent implements Cancellable {
 	private static HandlerList handlers = new HandlerList();
 	private Controller caught = null;
 	private FishingStatus status;
 
-	public PlayerFishEvent(Player p, FishingStatus status) {
+	public PlayerFishEvent(PlayerController p, FishingStatus status) {
 		super(p);
 		caught = null;
 		this.status = status;
 	}
 
-	public PlayerFishEvent(Player p, FishingStatus status, Controller caught) {
+	public PlayerFishEvent(PlayerController p, FishingStatus status, Controller caught) {
 		super(p);
 		this.status = status;
 		this.caught = caught;

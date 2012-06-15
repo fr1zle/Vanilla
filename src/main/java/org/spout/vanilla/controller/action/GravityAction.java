@@ -36,7 +36,7 @@ import org.spout.vanilla.controller.VanillaActionController;
 
 public class GravityAction extends EntityAction<VanillaActionController> {
 	@Override
-	public boolean shouldRun(Entity entity, VanillaActionController controller) {
+	public boolean shouldRun(Entity entity, VanillaActionController controller, float dt) {
 		Point future = entity.getPosition().add(controller.getVelocity());
 		//Non observers entities should not be loading chunks
 		if (!entity.isObserver() && future.getWorld().getChunkFromBlock(future, LoadOption.NO_LOAD) == null) {

@@ -30,7 +30,7 @@ import org.spout.api.entity.Entity;
 import org.spout.api.event.player.PlayerInteractEvent.Action;
 import org.spout.api.inventory.ItemStack;
 import org.spout.api.material.Material;
-import org.spout.api.player.Player;
+import org.spout.api.player.PlayerController;
 import org.spout.api.protocol.MessageHandler;
 import org.spout.api.protocol.Session;
 
@@ -46,20 +46,20 @@ import org.spout.vanilla.util.VanillaPlayerUtil;
 
 public class EntityInteractionMessageHandler extends MessageHandler<EntityInteractionMessage> {
 	@Override
-	public void handleServer(Session session, Player player, EntityInteractionMessage message) {
-		Entity clickedEntity = player.getEntity().getWorld().getEntity(message.getTarget());
+	public void handleServer(Session session, PlayerController player, EntityInteractionMessage message) {
+		Entity clickedEntity = player.getParent().getWorld().getEntity(message.getTarget());
 		if (clickedEntity == null) {
 			return;
 		}
 
-		ItemStack holding = VanillaPlayerUtil.getCurrentItem(player.getEntity());
+		ItemStack holding = VanillaPlayerUtil.getCurrentItem(player.getParent());
 		Material holdingMat = holding == null ? VanillaMaterials.AIR : holding.getMaterial();
 		if (holdingMat == null) {
 			holdingMat = VanillaMaterials.AIR;
 		}
 		if (message.isPunching()) {
-			VanillaPlayer vPlayer = (VanillaPlayer) player.getEntity().getController();
-			holdingMat.onInteract(player.getEntity(), clickedEntity, Action.LEFT_CLICK);
+			VanillaPlayer vPlayer = (VanillaPlayer) player.getParent().getController();
+			holdingMat.onInteract(player.getParent(), clickedEntity, Action.LEFT_CLICK);
 
 			if (clickedEntity.getController() instanceof VanillaPlayer && !VanillaConfiguration.PLAYER_PVP_ENABLED.getBoolean()) {
 				return;
@@ -83,7 +83,7 @@ public class EntityInteractionMessageHandler extends MessageHandler<EntityIntera
 				}
 			}
 		} else {
-			holdingMat.onInteract(player.getEntity(), clickedEntity, Action.RIGHT_CLICK);
+			holdingMat.onInteract(player.getParent(), clickedEntity, Action.RIGHT_CLICK);
 		}
 	}
 }

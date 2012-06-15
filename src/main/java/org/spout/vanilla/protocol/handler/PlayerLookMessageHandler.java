@@ -27,7 +27,7 @@
 package org.spout.vanilla.protocol.handler;
 
 import org.spout.api.entity.Entity;
-import org.spout.api.player.Player;
+import org.spout.api.player.PlayerController;
 import org.spout.api.protocol.MessageHandler;
 import org.spout.api.protocol.Session;
 
@@ -36,12 +36,12 @@ import org.spout.vanilla.protocol.msg.PlayerLookMessage;
 
 public final class PlayerLookMessageHandler extends MessageHandler<PlayerLookMessage> {
 	@Override
-	public void handleServer(Session session, Player player, PlayerLookMessage message) {
+	public void handleServer(Session session, PlayerController player, PlayerLookMessage message) {
 		if (player == null) {
 			return;
 		}
 
-		Entity entity = player.getEntity();
+		Entity entity = player.getParent();
 
 		if (entity == null) {
 			return;

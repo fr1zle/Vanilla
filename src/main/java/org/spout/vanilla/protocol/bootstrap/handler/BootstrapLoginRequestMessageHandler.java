@@ -29,7 +29,7 @@ package org.spout.vanilla.protocol.bootstrap.handler;
 import org.spout.api.Spout;
 import org.spout.api.event.Event;
 import org.spout.api.event.player.PlayerConnectEvent;
-import org.spout.api.player.Player;
+import org.spout.api.player.PlayerController;
 import org.spout.api.protocol.MessageHandler;
 import org.spout.api.protocol.Session;
 import org.spout.vanilla.VanillaPlugin;
@@ -40,7 +40,7 @@ import org.spout.vanilla.protocol.msg.LoginRequestMessage;
 
 public class BootstrapLoginRequestMessageHandler extends MessageHandler<LoginRequestMessage> {
 	@Override
-	public void handle(final Session session, final Player player, final LoginRequestMessage message) {
+	public void handle(final Session session, final PlayerController player, final LoginRequestMessage message) {
 		if (message.getId() > VanillaPlugin.MINECRAFT_PROTOCOL_ID) {
 			session.disconnect("Outdated server!", false);
 		} else if (message.getId() < VanillaPlugin.MINECRAFT_PROTOCOL_ID) {
@@ -69,8 +69,8 @@ public class BootstrapLoginRequestMessageHandler extends MessageHandler<LoginReq
 		}
 	}
 	
-	public static void playerConnect(Session session, String name) {
-		Event event = new PlayerConnectEvent(session, name);
+	public static void playerConnect(PlayerController controller, Session session, String name) {
+		Event event = new PlayerConnectEvent(controller, session, name);
 		session.getGame().getEventManager().callEvent(event);
 	}
 }

@@ -38,7 +38,7 @@ public class WanderAction extends EntityAction<VanillaActionController> {
 	private static final int WANDER_FREQ = 25;
 
 	@Override
-	public boolean shouldRun(Entity entity, VanillaActionController controller) {
+	public boolean shouldRun(Entity entity, VanillaActionController controller, float dt) {
 		return controller.getRandom().nextInt(100) < WANDER_FREQ;
 	}
 

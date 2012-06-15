@@ -29,14 +29,14 @@ package org.spout.vanilla.event.player;
 import org.spout.api.event.Cancellable;
 import org.spout.api.event.HandlerList;
 import org.spout.api.event.player.PlayerEvent;
-import org.spout.api.player.Player;
+import org.spout.api.player.PlayerController;
 
 public class PlayerLevelChangeEvent extends PlayerEvent implements Cancellable {
 	private static HandlerList handlers = new HandlerList();
 	private int previousLevel, newLevel;
 	private LevelChangeReason reason;
 
-	public PlayerLevelChangeEvent(Player p, int previousLevel, int newLevel, LevelChangeReason reason) {
+	public PlayerLevelChangeEvent(PlayerController p, int previousLevel, int newLevel, LevelChangeReason reason) {
 		super(p);
 		this.reason = reason;
 		this.previousLevel = previousLevel;

@@ -31,7 +31,7 @@ import org.spout.api.entity.component.controller.PlayerController;
 import org.spout.api.event.Cancellable;
 import org.spout.api.event.HandlerList;
 import org.spout.api.exception.InvalidControllerException;
-import org.spout.api.player.Player;
+import org.spout.api.player.PlayerController;
 
 import org.spout.vanilla.event.entity.VanillaEntityDeathEvent;
 
@@ -49,8 +49,8 @@ public class PlayerDeathEvent extends VanillaEntityDeathEvent {
 	 * Gets the player associated in this event.
 	 * @return The player.
 	 */
-	public Player getPlayer() {
-		return (Player) getEntity();
+	public PlayerController getPlayer() {
+		return (PlayerController) getEntity();
 	}
 
 	@Override

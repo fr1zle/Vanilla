@@ -29,7 +29,7 @@ package org.spout.vanilla.protocol.handler;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.spout.api.player.Player;
+import org.spout.api.player.PlayerController;
 import org.spout.api.protocol.MessageHandler;
 import org.spout.api.protocol.Session;
 import org.spout.api.util.Parameter;
@@ -41,41 +41,41 @@ import org.spout.vanilla.protocol.msg.EntityMetadataMessage;
 
 public final class EntityActionMessageHandler extends MessageHandler<EntityActionMessage> {
 	@Override
-	public void handleServer(Session session, Player player, EntityActionMessage message) {
+	public void handleServer(Session session, PlayerController player, EntityActionMessage message) {
 		if (player == null) {
 			return;
 		}
 
-		if (player.getEntity() == null) {
+		if (player.getParent() == null) {
 			return;
 		}
-		if (!(player.getEntity().getController() instanceof Living)) {
+		if (!(player.getParent().getController() instanceof Living)) {
 			return;
 		}
 
-		VanillaPlayer ve = (VanillaPlayer) player.getEntity().getController();
+		VanillaPlayer ve = (VanillaPlayer) player.getParent().getController();
 		List<Parameter<?>> parameters = new ArrayList<Parameter<?>>();
 
 		switch (message.getAction()) {
 			case EntityActionMessage.ACTION_CROUCH:
 				parameters.add(EntityMetadataMessage.Parameters.META_CROUCHED.get());
-				session.send(new EntityMetadataMessage(player.getEntity().getId(), parameters));
+				session.send(new EntityMetadataMessage(player.getParent().getId(), parameters));
 				break;
 			case EntityActionMessage.ACTION_UNCROUCH:
 				parameters.add(EntityMetadataMessage.Parameters.META_CROUCHED.get());
-				session.send(new EntityMetadataMessage(player.getEntity().getId(), parameters));
+				session.send(new EntityMetadataMessage(player.getParent().getId(), parameters));
 				break;
 			case EntityActionMessage.ACTION_LEAVE_BED:
-				session.send(new EntityActionMessage(player.getEntity().getId(), EntityActionMessage.ACTION_LEAVE_BED));
+				session.send(new EntityActionMessage(player.getParent().getId(), EntityActionMessage.ACTION_LEAVE_BED));
 				break;
 			case EntityActionMessage.ACTION_START_SPRINTING:
 				parameters.add(EntityMetadataMessage.Parameters.META_SPRINTING.get());
-				session.send(new EntityMetadataMessage(player.getEntity().getId(), parameters));
+				session.send(new EntityMetadataMessage(player.getParent().getId(), parameters));
 				ve.setSprinting(true);
 				break;
 			case EntityActionMessage.ACTION_STOP_SPRINTING:
 				parameters.add(EntityMetadataMessage.Parameters.META_SPRINTING.get());
-				session.send(new EntityMetadataMessage(player.getEntity().getId(), parameters));
+				session.send(new EntityMetadataMessage(player.getParent().getId(), parameters));
 				ve.setSprinting(false);
 				break;
 			default:

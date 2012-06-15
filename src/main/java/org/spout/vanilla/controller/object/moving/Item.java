@@ -31,7 +31,7 @@ import org.spout.api.entity.Entity;
 import org.spout.api.inventory.ItemStack;
 import org.spout.api.material.Material;
 import org.spout.api.math.Vector3;
-import org.spout.api.player.Player;
+import org.spout.api.player.PlayerController;
 
 import org.spout.vanilla.configuration.VanillaConfiguration;
 import org.spout.vanilla.controller.VanillaControllerTypes;
@@ -98,12 +98,12 @@ public class Item extends Substance {
 
 		super.onTick(dt);
 
-		Player closestPlayer = getParent().getWorld().getNearestPlayer(getParent(), distance);
+		PlayerController closestPlayer = getParent().getWorld().getNearestPlayer(getParent(), distance);
 		if (closestPlayer == null) {
 			return;
 		}
 
-		Entity entity = closestPlayer.getEntity();
+		Entity entity = closestPlayer.getParent();
 		if (!(entity.getController() instanceof VanillaPlayer)) {
 			return;
 		}

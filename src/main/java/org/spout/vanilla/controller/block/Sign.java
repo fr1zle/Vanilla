@@ -29,7 +29,7 @@ package org.spout.vanilla.controller.block;
 import java.util.HashSet;
 
 import org.spout.api.geo.cuboid.Block;
-import org.spout.api.player.Player;
+import org.spout.api.player.PlayerController;
 
 import org.spout.vanilla.controller.VanillaBlockController;
 import org.spout.vanilla.controller.VanillaControllerTypes;
@@ -39,7 +39,7 @@ import org.spout.vanilla.util.VanillaNetworkUtil;
 
 public class Sign extends VanillaBlockController {
 	private String[] text = new String[4];
-	private HashSet<Player> dirty = new HashSet<Player>();
+	private HashSet<PlayerController> dirty = new HashSet<PlayerController>();
 	private int range = 20;
 
 	public Sign() {
@@ -53,7 +53,7 @@ public class Sign extends VanillaBlockController {
 	@Override
 	public void onTick(float dt) {
 		Block block = getBlock();
-		HashSet<Player> nearby = new HashSet<Player>();
+		HashSet<PlayerController> nearby = new HashSet<PlayerController>();
 		nearby.addAll(block.getWorld().getNearbyPlayers(block.getPosition(), range));
 		if (nearby.isEmpty()) {
 			return;
@@ -94,6 +94,6 @@ public class Sign extends VanillaBlockController {
 
 	private void update() {
 		Block block = getBlock();
-		VanillaNetworkUtil.sendPacket(dirty.toArray(new Player[dirty.size()]), new UpdateSignMessage(block.getX(), block.getY(), block.getZ(), text));
+		VanillaNetworkUtil.sendPacket(dirty.toArray(new PlayerController[dirty.size()]), new UpdateSignMessage(block.getX(), block.getY(), block.getZ(), text));
 	}
 }

@@ -26,7 +26,7 @@
  */
 package org.spout.vanilla.protocol.handler;
 
-import org.spout.api.player.Player;
+import org.spout.api.player.PlayerController;
 import org.spout.api.protocol.MessageHandler;
 import org.spout.api.protocol.Session;
 
@@ -34,7 +34,7 @@ import org.spout.vanilla.protocol.msg.ChatMessage;
 
 public final class ChatMessageHandler extends MessageHandler<ChatMessage> {
 	@Override
-	public void handleServer(Session session, Player player, ChatMessage message) {
+	public void handleServer(Session session, PlayerController player, ChatMessage message) {
 		if (player == null) {
 			return;
 		}
