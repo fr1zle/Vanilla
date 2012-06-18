@@ -57,6 +57,8 @@ import org.spout.vanilla.controller.living.Human;
 import org.spout.vanilla.controller.living.player.VanillaPlayer;
 import org.spout.vanilla.controller.source.HealthChangeReason;
 import org.spout.vanilla.data.effect.type.Speed;
+import org.spout.vanilla.inventory.block.FurnaceInventory;
+import org.spout.vanilla.inventory.window.block.FurnaceWindow;
 import org.spout.vanilla.util.explosion.ExplosionModels;
 import org.spout.vanilla.world.generator.VanillaObjects;
 import org.spout.vanilla.world.generator.normal.object.RandomObject;
@@ -354,5 +356,18 @@ public class TestCommands {
 		Player player = (Player) source;
 		Entity entity = player.getEntity();
 		entity.getWorld().createAndSpawnEntity(entity.getPosition(), new Human(args.getString(0)));
+	}
+
+	@Command(aliases = "furnace", desc = "Opens a furnace inventory", min = 0, max = 0)
+	public void furnace(CommandContext args, CommandSource source) throws CommandException {
+		if (!(source instanceof Player)) {
+			throw new CommandException("Only a player may openWindow a furnace");
+		}
+
+		Controller controller = ((Player) source).getEntity().getController();
+		if (controller instanceof VanillaPlayer) {
+			source.sendMessage("Opening furnace window");
+			((VanillaPlayer) controller).openWindow(new FurnaceWindow(new FurnaceInventory(), (VanillaPlayer) controller));
+		}
 	}
 }

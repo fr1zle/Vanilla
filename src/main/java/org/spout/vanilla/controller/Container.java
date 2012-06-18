@@ -1,7 +1,6 @@
 /*
- * This file is part of Vanilla.
+ * This file is part of Vanilla (http://www.spout.org/).
  *
- * Copyright (c) 2011-2012, VanillaDev <http://www.spout.org/>
  * Vanilla is licensed under the SpoutDev License Version 1.
  *
  * Vanilla is free software: you can redistribute it and/or modify
@@ -19,35 +18,15 @@
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License,
- * the MIT license and the SpoutDev License Version 1 along with this program.
+ * the MIT license and the SpoutDev license version 1 along with this program.
  * If not, see <http://www.gnu.org/licenses/> for the GNU Lesser General Public
  * License and see <http://www.spout.org/SpoutDevLicenseV1.txt> for the full license,
  * including the MIT license.
  */
-package org.spout.vanilla.controller.block;
+package org.spout.vanilla.controller;
 
-import java.util.HashSet;
-import java.util.Set;
+import org.spout.api.inventory.Inventory;
 
-import org.spout.vanilla.controller.VanillaControllerTypes;
-import org.spout.vanilla.controller.WindowController;
-import org.spout.vanilla.controller.living.player.VanillaPlayer;
-import org.spout.vanilla.inventory.block.CraftingTableInventory;
-import org.spout.vanilla.inventory.window.Window;
-import org.spout.vanilla.inventory.window.block.CraftingTableWindow;
-import org.spout.vanilla.material.VanillaMaterials;
-
-public class CraftingTable extends WindowController {
-	protected CraftingTable() {
-		super(VanillaControllerTypes.CRAFTING_TABLE, VanillaMaterials.CRAFTING_TABLE);
-	}
-
-	@Override
-	public void onAttached() {
-	}
-
-	@Override
-	public Window createWindow(VanillaPlayer player) {
-		return new CraftingTableWindow(new CraftingTableInventory(), player);
-	}
+public interface Container {
+	public Inventory getInventory();
 }

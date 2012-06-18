@@ -40,6 +40,7 @@ import org.spout.api.material.source.MaterialSource;
 import org.spout.api.util.BlockIterator;
 
 import org.spout.vanilla.controller.living.Living;
+import org.spout.vanilla.inventory.player.PlayerInventory;
 import org.spout.vanilla.material.VanillaMaterials;
 import org.spout.vanilla.util.VanillaPlayerUtil;
 
@@ -83,10 +84,12 @@ public class EmptyContainer extends BlockItem {
 					return;
 				}
 
-				InventorySlot inv = VanillaPlayerUtil.getCurrentSlot(entity);
-				if (inv != null) {
-					inv.setItem(new ItemStack(cont, 1));
+				PlayerInventory inv = VanillaPlayerUtil.getInventory(entity);
+				if (inv == null) {
+					return;
 				}
+
+				inv.getMain().setCurrentItem(new ItemStack(cont, 1));
 				return;
 			}
 		}

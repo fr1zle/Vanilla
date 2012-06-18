@@ -31,11 +31,11 @@ import java.util.Random;
 import org.spout.api.entity.Entity;
 import org.spout.api.event.player.PlayerInteractEvent.Action;
 import org.spout.api.geo.cuboid.Block;
-import org.spout.api.inventory.special.InventorySlot;
 import org.spout.api.material.block.BlockFace;
 import org.spout.api.material.block.BlockFaces;
 
 import org.spout.vanilla.controller.object.misc.Painting;
+import org.spout.vanilla.inventory.player.PlayerInventory;
 import org.spout.vanilla.material.item.VanillaItemMaterial;
 import org.spout.vanilla.util.VanillaPlayerUtil;
 
@@ -81,9 +81,9 @@ public class PaintingItem extends VanillaItemMaterial {
 		}
 		Painting painting = new Painting(PaintingStyle.values()[random.nextInt(PaintingStyle.values().length)], BlockFaces.NESW.indexOf(clickedface, -1));//TODO fix the 0 here, and the position on the next line
 		block.getWorld().createAndSpawnEntity(block.translate(clickedface).getPosition(), painting);
-		InventorySlot inv = VanillaPlayerUtil.getCurrentSlot(entity);
-		if (inv != null) {
-			inv.addItemAmount(0, -1);
+		PlayerInventory inventory = VanillaPlayerUtil.getInventory(entity);
+		if (inventory != null) {
+			inventory.getMain().addCurrentItemAmount(-1);
 		}
 	}
 }

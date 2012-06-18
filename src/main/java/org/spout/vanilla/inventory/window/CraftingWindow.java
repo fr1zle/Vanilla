@@ -1,7 +1,6 @@
 /*
- * This file is part of Vanilla.
+ * This file is part of Vanilla (http://www.spout.org/).
  *
- * Copyright (c) 2011-2012, VanillaDev <http://www.spout.org/>
  * Vanilla is licensed under the SpoutDev License Version 1.
  *
  * Vanilla is free software: you can redistribute it and/or modify
@@ -19,83 +18,55 @@
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License,
- * the MIT license and the SpoutDev License Version 1 along with this program.
+ * the MIT license and the SpoutDev license version 1 along with this program.
  * If not, see <http://www.gnu.org/licenses/> for the GNU Lesser General Public
  * License and see <http://www.spout.org/SpoutDevLicenseV1.txt> for the full license,
  * including the MIT license.
  */
-package org.spout.vanilla.window;
+package org.spout.vanilla.inventory.window;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.spout.api.Spout;
 import org.spout.api.inventory.Inventory;
-import org.spout.api.inventory.InventoryBase;
 import org.spout.api.inventory.ItemStack;
 import org.spout.api.inventory.Recipe;
 import org.spout.api.inventory.RecipeManager;
 import org.spout.api.material.Material;
 
-import org.spout.vanilla.controller.WindowOwner;
 import org.spout.vanilla.controller.living.player.VanillaPlayer;
 import org.spout.vanilla.inventory.CraftingGrid;
+import org.spout.vanilla.inventory.Parsable;
 
-public abstract class CraftingWindow extends Window {
-	protected final CraftingGrid craftingGrid;
+/**
+ * Represents a window where some grid is present as well as an output to update.
+ * @param <T>
+ */
+public abstract class CraftingWindow<T extends Parsable> extends Window<T> {
+	protected final CraftingGrid grid;
 
-	public CraftingWindow(int id, String title, VanillaPlayer owner, CraftingGrid craftingGrid, WindowOwner... windowOwners) {
-		super(id, title, owner, windowOwners);
-		this.craftingGrid = craftingGrid;
+	public CraftingWindow(T container, CraftingGrid grid, VanillaPlayer owner, WindowType type, String title, int size) {
+		super(container, owner, type, title, size);
+		this.grid = grid;
 	}
 
 	public CraftingGrid getCraftingGrid() {
-		return craftingGrid;
-	}
-
-	@Override
-	public void onSlotSet(InventoryBase inventory, int slot, ItemStack item) {
-		super.onSlotSet(inventory, slot, item);
-		int size = 0;
-		for (InventoryBase i : getInventory().getInventories()) {
-			if (i != craftingGrid.getGridInventory() && slot > i.getSize() + size) {
-				size += i.getSize();
-			}
-		}
-		for (int i : craftingGrid.getGridArray()) {
-			if (i + size == slot) {
-				updateOutput();
-				break;
-			}
-		}
-	}
-
-	@Override
-	public boolean onClick(int clickedSlot, boolean rightClick, boolean shift) {
-		int size = 0;
-		for (InventoryBase i : getInventory().getInventories()) {
-			if (i != craftingGrid.getGridInventory()) {
-				size += i.getSize();
-			}
-		}
-		if (itemOnCursor != null && clickedSlot == craftingGrid.getOutputSlot() + size && !shift) {
-			return false;
-		}
-		return super.onClick(clickedSlot, rightClick, shift);
+		return grid;
 	}
 
 	private boolean updateOutput() {
 		RecipeManager recipeManager = Spout.getEngine().getRecipeManager();
-		Inventory grid = craftingGrid.getGridInventory();
-		int[] gridArray = craftingGrid.getGridArray();
-		int rowSize = craftingGrid.getRowSize();
+		Inventory inventory = grid.getGridInventory();
+		int[] gridArray = grid.getGridArray();
+		int rowSize = grid.getRowSize();
 		List<List<Material>> materials = new ArrayList<List<Material>>();
 		List<Material> current = new ArrayList<Material>();
 		List<Material> shapeless = new ArrayList<Material>();
 		int cntr = 0;
 		for (int slot : gridArray) {
 			cntr++;
-			ItemStack item = grid.getItem(slot);
+			ItemStack item = inventory.getItem(slot);
 			Material mat = null;
 			if (item != null) {
 				mat = item.getMaterial();
@@ -116,9 +87,9 @@ public abstract class CraftingWindow extends Window {
 			recipe = recipeManager.matchShapelessRecipe(shapeless);
 		}
 		if (recipe != null) {
-			int outputSlot = craftingGrid.getOutputSlot();
-			if (grid.getItem(outputSlot) == null) {
-				grid.setItem(outputSlot, recipe.getResult());
+			int outputSlot = grid.getOutputSlot();
+			if (inventory.getItem(outputSlot) == null) {
+				inventory.setItem(outputSlot, recipe.getResult());
 			}
 			return true;
 		}

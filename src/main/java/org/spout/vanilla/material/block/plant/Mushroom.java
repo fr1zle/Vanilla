@@ -37,6 +37,7 @@ import org.spout.api.inventory.special.InventorySlot;
 import org.spout.api.material.BlockMaterial;
 import org.spout.api.material.block.BlockFace;
 
+import org.spout.vanilla.inventory.player.PlayerInventory;
 import org.spout.vanilla.material.VanillaMaterials;
 import org.spout.vanilla.material.block.Plant;
 import org.spout.vanilla.material.block.attachable.GroundAttachable;
@@ -60,11 +61,11 @@ public class Mushroom extends GroundAttachable implements Plant {
 		if (type != PlayerInteractEvent.Action.RIGHT_CLICK) {
 			return;
 		}
-		InventorySlot inv = VanillaPlayerUtil.getCurrentSlot(entity);
-		ItemStack current = inv.getItem();
+		PlayerInventory inv = VanillaPlayerUtil.getInventory(entity);
+		ItemStack current = inv.getMain().getCurrentItem();
 		if (current != null && current.getSubMaterial().equals(Dye.BONE_MEAL)) {
 			if (VanillaPlayerUtil.isSurvival(entity)) {
-				inv.addItemAmount(0, -1);
+				inv.getMain().addCurrentItemAmount(-1);
 			}
 			final BlockMaterial mushroomType = block.getMaterial();
 			final LargePlantObject mushroom;

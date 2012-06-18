@@ -27,26 +27,57 @@
 package org.spout.vanilla.inventory.block;
 
 import org.spout.api.inventory.Inventory;
-import org.spout.vanilla.controller.block.Dispenser;
+import org.spout.api.inventory.InventoryBase;
+
+import org.spout.vanilla.controller.living.player.VanillaPlayer;
+import org.spout.vanilla.inventory.Convertable;
+import org.spout.vanilla.inventory.Parsable;
 import org.spout.vanilla.inventory.VanillaInventory;
+import org.spout.vanilla.inventory.player.MainInventory;
+import org.spout.vanilla.inventory.window.Window;
+import org.spout.vanilla.util.SlotIndexMap;
 
 /**
- * Represents a dispenser inventory belonging to a dispenser controller.
+ * Represents the inventory of a {@link org.spout.vanilla.controller.block.Dispenser}.
  */
-public class DispenserInventory extends Inventory implements VanillaInventory {
+public class DispenserInventory extends Inventory implements Parsable, Convertable, VanillaInventory {
+	public static final SlotIndexMap MAIN_SLOTS = new SlotIndexMap("36-44, 27-35, 18-26, 9-17");
+	public static final SlotIndexMap SLOTS = new SlotIndexMap("6-8, 3-5, 0-2");
+	public static final int MAIN_START = 8, MAIN_END = 45;
+	public static final int START = 0, END = 9;
 	private static final long serialVersionUID = 1L;
-	private final Dispenser owner;
 
-	public DispenserInventory(Dispenser owner) {
+	public DispenserInventory() {
 		super(9);
-		this.owner = owner;
 	}
 
-	/**
-	 * Returns the dispenser controller that this inventory belongs to.
-	 * @return owner the dispenser controller
-	 */
-	public Dispenser getOwner() {
-		return owner;
+	@Override
+	public Inventory parse(Window window, VanillaPlayer player, int slot) {
+		if (slot > MAIN_START && slot < MAIN_END) {
+			return player.getInventory().getMain();
+		} else if (slot >= START && slot < END) {
+			return this;
+		}
+		return null;
+	}
+
+	@Override
+	public int convert(Window window, InventoryBase inventory, int i) {
+		if (inventory instanceof MainInventory) {
+			return MAIN_SLOTS.getSpoutSlot(i);
+		} else if (inventory instanceof DispenserInventory) {
+			return SLOTS.getSpoutSlot(i);
+		}
+		return -1;
+	}
+
+	@Override
+	public int revert(Window window, InventoryBase inventory, int i) {
+		if (inventory instanceof MainInventory) {
+			return MAIN_SLOTS.getMinecraftSlot(i);
+		} else if (inventory instanceof DispenserInventory) {
+			return SLOTS.getMinecraftSlot(i);
+		}
+		return -1;
 	}
 }

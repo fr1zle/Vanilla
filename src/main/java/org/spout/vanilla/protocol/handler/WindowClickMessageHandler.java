@@ -32,29 +32,29 @@ import org.spout.api.protocol.MessageHandler;
 import org.spout.api.protocol.Session;
 
 import org.spout.vanilla.controller.living.player.VanillaPlayer;
+import org.spout.vanilla.inventory.window.Window;
 import org.spout.vanilla.protocol.msg.TransactionMessage;
 import org.spout.vanilla.protocol.msg.WindowClickMessage;
-import org.spout.vanilla.window.Window;
 
 public final class WindowClickMessageHandler extends MessageHandler<WindowClickMessage> {
 	@Override
 	public void handleServer(Session session, Player player, WindowClickMessage message) {
+		if (session == null || player == null || message == null) {
+			return;
+		}
+
 		Entity entity = player.getEntity();
 		if (!(entity.getController() instanceof VanillaPlayer)) {
 			return;
 		}
-		
+
 		VanillaPlayer controller = (VanillaPlayer) entity.getController();
 		Window window = controller.getActiveWindow();
-		boolean result = false;
+		boolean result;
 		if (message.getSlot() == 64537) {
-			// outside the window
 			result = window.onOutsideClick();
 		} else {
-			int slot = window.getSlotIndexMap().getSpoutSlot(message.getSlot());
-			if (slot != -1) {
-				result = window.onClick(slot, message.isRightClick(), message.isShift());
-			}
+			result = window.click(message.getSlot(), message.isRightClick(), message.isShift());
 		}
 		session.send(new TransactionMessage(message.getWindowId(), message.getTransaction(), result));
 	}

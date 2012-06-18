@@ -27,11 +27,24 @@
 package org.spout.vanilla.inventory.block;
 
 import org.spout.api.inventory.Inventory;
+import org.spout.api.inventory.InventoryBase;
 import org.spout.api.inventory.ItemStack;
 
+import org.spout.vanilla.controller.living.player.VanillaPlayer;
+import org.spout.vanilla.inventory.Convertable;
+import org.spout.vanilla.inventory.Parsable;
 import org.spout.vanilla.inventory.VanillaInventory;
+import org.spout.vanilla.inventory.player.MainInventory;
+import org.spout.vanilla.inventory.window.Window;
+import org.spout.vanilla.util.SlotIndexMap;
 
-public class BrewingStandInventory extends Inventory implements VanillaInventory {
+/**
+ * Represents the inventory of a {@link org.spout.vanilla.controller.block.BrewingStand}.
+ */
+public class BrewingStandInventory extends Inventory implements Parsable, Convertable, VanillaInventory {
+	public static final int MAIN_START = 3, MAIN_END = 40;
+	public static final int START = 0, END = 4;
+	public static final SlotIndexMap MAIN_SLOTS = new SlotIndexMap("31-39, 22-30, 13-21, 4-12");
 	private static final long serialVersionUID = 1L;
 
 	public BrewingStandInventory() {
@@ -41,11 +54,11 @@ public class BrewingStandInventory extends Inventory implements VanillaInventory
 	/**
 	 * Gets the output slot at the given index. There are three output slots; the index given must be between 0 and 3.
 	 * @param index of the output slot
-	 * @return {@link ItemStack} in the output
+	 * @return {@link org.spout.api.inventory.ItemStack} in the output
 	 */
 	public ItemStack getOutput(int index) {
 		if (index < 0 || index > 3) {
-			throw new IllegalArgumentException("The output index of the brewing stand must be between 0 and 3.");
+			throw new IndexOutOfBoundsException("The output index of the brewing stand must be between 0 and 3.");
 		}
 		return getItem(index);
 	}
@@ -56,5 +69,37 @@ public class BrewingStandInventory extends Inventory implements VanillaInventory
 	 */
 	public ItemStack getInput() {
 		return getItem(3);
+	}
+
+	// TODO: Test undocumented slot conversion
+
+	@Override
+	public Inventory parse(Window window, VanillaPlayer player, int slot) {
+		if (slot > MAIN_START && slot < MAIN_END) {
+			return player.getInventory().getMain();
+		} else if (slot >= START && slot < END) {
+			return this;
+		}
+		return null;
+	}
+
+	@Override
+	public int convert(Window window, InventoryBase inventory, int i) {
+		if (inventory instanceof MainInventory) {
+			return MAIN_SLOTS.getSpoutSlot(i);
+		} else if (inventory instanceof BrewingStandInventory) {
+			return i;
+		}
+		return -1;
+	}
+
+	@Override
+	public int revert(Window window, InventoryBase inventory, int i) {
+		if (inventory instanceof MainInventory) {
+			return MAIN_SLOTS.getMinecraftSlot(i);
+		} else if (inventory instanceof BrewingStandInventory) {
+			return i;
+		}
+		return -1;
 	}
 }

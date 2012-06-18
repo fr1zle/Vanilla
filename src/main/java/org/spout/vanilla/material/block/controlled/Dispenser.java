@@ -28,8 +28,8 @@ package org.spout.vanilla.material.block.controlled;
 
 import java.util.ArrayList;
 
-import org.spout.api.entity.component.Controller;
 import org.spout.api.entity.Entity;
+import org.spout.api.entity.component.Controller;
 import org.spout.api.event.player.PlayerInteractEvent.Action;
 import org.spout.api.geo.cuboid.Block;
 import org.spout.api.inventory.ItemStack;
@@ -38,6 +38,7 @@ import org.spout.api.material.block.BlockFaces;
 
 import org.spout.vanilla.controller.VanillaControllerTypes;
 import org.spout.vanilla.controller.living.player.VanillaPlayer;
+import org.spout.vanilla.inventory.window.block.DispenserWindow;
 import org.spout.vanilla.material.Mineable;
 import org.spout.vanilla.material.block.Directional;
 import org.spout.vanilla.material.item.tool.Pickaxe;
@@ -85,6 +86,10 @@ public class Dispenser extends ControlledMaterial implements Directional, Mineab
 		return false;
 	}
 
+	public org.spout.vanilla.controller.block.Dispenser getController(Block block) {
+		return (org.spout.vanilla.controller.block.Dispenser) super.getController(block);
+	}
+
 	@Override
 	public void onInteractBy(Entity entity, Block block, Action action, BlockFace face) {
 		if (action == Action.RIGHT_CLICK) {
@@ -92,9 +97,7 @@ public class Dispenser extends ControlledMaterial implements Directional, Mineab
 			if (!(controller instanceof VanillaPlayer)) {
 				return;
 			}
-
-			// Open the dispenser
-			((org.spout.vanilla.controller.block.Dispenser) block.getController()).open((VanillaPlayer) controller);
+			getController(block).open((VanillaPlayer) controller);
 		}
 	}
 

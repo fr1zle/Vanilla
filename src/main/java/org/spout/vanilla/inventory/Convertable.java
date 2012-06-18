@@ -24,26 +24,29 @@
  * License and see <http://www.spout.org/SpoutDevLicenseV1.txt> for the full license,
  * including the MIT license.
  */
-package org.spout.vanilla.window.block;
+package org.spout.vanilla.inventory;
 
-import org.spout.vanilla.controller.block.Furnace;
-import org.spout.vanilla.controller.living.player.VanillaPlayer;
-import org.spout.vanilla.util.SlotIndexMap;
-import org.spout.vanilla.window.TransactionWindow;
+import org.spout.api.inventory.InventoryBase;
 
-public class FurnaceWindow extends TransactionWindow {
-	private static final SlotIndexMap SLOTS = new SlotIndexMap("30-38, 21-29, 12-20, 3-11, 1, 2, 0");
+import org.spout.vanilla.inventory.window.Window;
 
-	public FurnaceWindow(VanillaPlayer owner, Furnace furnace) {
-		super(2, "Furnace", owner, furnace);
-		this.setSlotIndexMap(SLOTS);
-	}
+/**
+ * Represents a window system that needs a conversion from the native slot sent from the client.
+ */
+public interface Convertable {
+	/**
+	 * Converts the integer into the converted integer.
+	 * @param inventory being handled.
+	 * @param i integer to convert
+	 * @return converted integer
+	 */
+	public int convert(Window window, InventoryBase inventory, int i);
 
-	@Override
-	public boolean onClick(int clickedSlot, boolean rightClick, boolean shift) {
-		if (clickedSlot == 37 && itemOnCursor != null) {
-			return false;
-		}
-		return super.onClick(clickedSlot, rightClick, shift);
-	}
+	/**
+	 * Reverts the integer into the reverted integer.
+	 * @param inventory being handled
+	 * @param i to revert into native slot
+	 * @return reverted integer
+	 */
+	public int revert(Window window, InventoryBase inventory, int i);
 }

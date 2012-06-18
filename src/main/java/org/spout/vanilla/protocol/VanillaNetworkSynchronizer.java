@@ -59,6 +59,8 @@ import org.spout.vanilla.data.Difficulty;
 import org.spout.vanilla.data.Dimension;
 import org.spout.vanilla.data.GameMode;
 import org.spout.vanilla.data.WorldType;
+import org.spout.vanilla.inventory.Convertable;
+import org.spout.vanilla.inventory.window.Window;
 import org.spout.vanilla.material.VanillaMaterials;
 import org.spout.vanilla.protocol.msg.BlockChangeMessage;
 import org.spout.vanilla.protocol.msg.ChatMessage;
@@ -75,7 +77,6 @@ import org.spout.vanilla.protocol.msg.RespawnMessage;
 import org.spout.vanilla.protocol.msg.SetWindowSlotMessage;
 import org.spout.vanilla.protocol.msg.SetWindowSlotsMessage;
 import org.spout.vanilla.protocol.msg.SpawnPositionMessage;
-import org.spout.vanilla.window.Window;
 import org.spout.vanilla.world.generator.VanillaBiome;
 
 public class VanillaNetworkSynchronizer extends NetworkSynchronizer implements ProtocolEventListener {
@@ -453,46 +454,47 @@ public class VanillaNetworkSynchronizer extends NetworkSynchronizer implements P
 
 	@Override
 	public void onSlotSet(InventoryBase inventory, int slot, ItemStack item) {
-		Controller c = owner.getEntity().getController();
-		if (!(c instanceof VanillaPlayer)) {
+		Controller controller = owner.getEntity().getController();
+		if (!(controller instanceof VanillaPlayer)) {
 			return;
 		}
 
-		VanillaPlayer controller = (VanillaPlayer) c;
-		Window window = controller.getActiveWindow();
-
-		if (window.getInventory() != inventory) {
-			return;
+		// Get the slot to send to the client
+		VanillaPlayer player = (VanillaPlayer) controller;
+		Window window = player.getActiveWindow();
+		if (inventory instanceof Convertable) {
+			slot = ((Convertable) inventory).revert(window, inventory, slot);
 		}
 
-		slot = window.getSlotIndexMap().getMinecraftSlot(slot);
-		if (slot == -1) {
-			return;
-		}
-
-		Message message;
+		SetWindowSlotMessage msg;
+		int id = window.getInstanceId();
 		if (item == null) {
-			message = new SetWindowSlotMessage(window.getInstanceId(), slot);
+			msg = new SetWindowSlotMessage(id, slot);
 		} else {
-			message = new SetWindowSlotMessage(window.getInstanceId(), slot, getMinecraftId(item.getMaterial().getId()), item.getAmount(), item.getData(), item.getNBTData());
+			msg = new SetWindowSlotMessage(id, slot, getMinecraftId(item.getMaterial().getId()), item.getAmount(), item.getData(), item.getNBTData());
 		}
-		queuedInventoryUpdates.put(slot, message);
+		queuedInventoryUpdates.put(slot, msg);
 	}
 
 	@Override
 	public void updateAll(InventoryBase inventory, ItemStack[] slots) {
-		Controller c = owner.getEntity().getController();
-		if (!(c instanceof VanillaPlayer)) {
+		Controller controller = owner.getEntity().getController();
+		if (!(controller instanceof VanillaPlayer)) {
 			return;
 		}
 
-		Window window = ((VanillaPlayer) c).getActiveWindow();
+		VanillaPlayer player = (VanillaPlayer) controller;
+		Window window = player.getActiveWindow();
+		ItemStack[] newSlots = slots.clone();
 
-		if (window.getInventory() != inventory) {
-			return;
+		if (inventory instanceof Convertable) {
+			Convertable convertable = (Convertable) inventory;
+			for (int i = 0; i < slots.length; i++) {
+				newSlots[convertable.revert(window, inventory, i)] = slots[i];
+			}
 		}
 
-		session.send(new SetWindowSlotsMessage((byte) window.getInstanceId(), window.getSlotIndexMap().getMinecraftItems(slots)));
+		session.send(new SetWindowSlotsMessage((byte) window.getInstanceId(), newSlots));
 		queuedInventoryUpdates.clear();
 	}
 

@@ -48,9 +48,12 @@ import org.spout.vanilla.controller.object.moving.Item;
 import org.spout.vanilla.controller.source.DamageCause;
 import org.spout.vanilla.controller.source.HealthChangeReason;
 import org.spout.vanilla.data.GameMode;
-import org.spout.vanilla.material.enchantment.Enchantments;
+import org.spout.vanilla.inventory.player.MainInventory;
 import org.spout.vanilla.inventory.player.PlayerInventory;
+import org.spout.vanilla.inventory.window.DefaultWindow;
+import org.spout.vanilla.inventory.window.Window;
 import org.spout.vanilla.material.VanillaMaterials;
+import org.spout.vanilla.material.enchantment.Enchantments;
 import org.spout.vanilla.material.item.armor.Armor;
 import org.spout.vanilla.protocol.msg.ChangeGameStateMessage;
 import org.spout.vanilla.protocol.msg.DestroyEntityMessage;
@@ -62,8 +65,6 @@ import org.spout.vanilla.protocol.msg.UpdateHealthMessage;
 import org.spout.vanilla.util.EnchantmentUtil;
 import org.spout.vanilla.util.VanillaNetworkUtil;
 import org.spout.vanilla.util.VanillaPlayerUtil;
-import org.spout.vanilla.window.DefaultWindow;
-import org.spout.vanilla.window.Window;
 
 import static org.spout.vanilla.util.VanillaNetworkUtil.sendPacket;
 
@@ -78,7 +79,8 @@ public class VanillaPlayer extends Human implements PlayerController {
 	protected boolean poisoned;
 	protected boolean flying;
 	protected final PlayerInventory playerInventory = new PlayerInventory();
-	protected Window activeWindow = new DefaultWindow(this);
+	protected final DefaultWindow defaultWindow = new DefaultWindow(this);
+	protected Window activeWindow = defaultWindow;
 	protected String tabListName;
 	protected GameMode gameMode;
 	protected int distanceMoved;
@@ -93,7 +95,7 @@ public class VanillaPlayer extends Human implements PlayerController {
 	 */
 	public VanillaPlayer(Player p, GameMode gameMode) {
 		super(p.getName());
-		setRenderedItemInHand(playerInventory.getQuickbar().getCurrentItem());
+		setRenderedItemInHand(playerInventory.getMain().getCurrentItem());
 		owner = p;
 		tabListName = owner.getName();
 		compassTarget = owner.getEntity().getWorld().getSpawnPoint().getPosition();
@@ -122,8 +124,10 @@ public class VanillaPlayer extends Human implements PlayerController {
 	@Override
 	public void onTick(float dt) {
 		super.onTick(dt);
-		if(playerDead) return;
-		
+		if (playerDead) {
+			return;
+		}
+
 		Player player = getPlayer();
 		if (player == null || player.getSession() == null) {
 			return;
@@ -253,7 +257,12 @@ public class VanillaPlayer extends Human implements PlayerController {
 
 				// Remove durability from each piece of armor
 				short penalty = cause.getDurabilityPenalty();
-				getInventory().getQuickbar().getCurrentSlotInventory().addItemData(0, penalty);
+				if (item.getData() - penalty < 1) {
+					getInventory().getMain().setCurrentItem(null);
+				} else {
+					MainInventory inv = getInventory().getMain();
+					inv.addItemData(inv.getCurrentSlot(), penalty);
+				}
 			}
 		}
 
@@ -500,32 +509,6 @@ public class VanillaPlayer extends Human implements PlayerController {
 	}
 
 	/**
-	 * Sets and opens the new active {@link Window} for the player.
-	 * @param activeWindow the window to open and set as the active window.
-	 */
-	public void setWindow(Window activeWindow) {
-		Window old = this.activeWindow;
-		this.activeWindow = activeWindow;
-		old.close();
-		activeWindow.open();
-	}
-
-	/**
-	 * Closes the active {@link Window}.
-	 */
-	public void closeWindow() {
-		this.setWindow(new DefaultWindow(this));
-	}
-
-	/**
-	 * Gets the {@link Window} currently opened. If no window is opened a {@link DefaultWindow} will be returned.
-	 * @return the currently active window.
-	 */
-	public Window getActiveWindow() {
-		return this.activeWindow;
-	}
-
-	/**
 	 * Gets the player's {@link PlayerInventory}.
 	 * @return the player's inventory
 	 */
@@ -537,7 +520,7 @@ public class VanillaPlayer extends Human implements PlayerController {
 	 * Drops the player's current item.
 	 */
 	public void dropItem() {
-		ItemStack current = this.getInventory().getQuickbar().getCurrentItem();
+		ItemStack current = this.getInventory().getMain().getCurrentItem();
 		if (current == null) {
 			return;
 		}
@@ -549,14 +532,55 @@ public class VanillaPlayer extends Human implements PlayerController {
 		} else {
 			current = null;
 		}
-		this.getInventory().getQuickbar().setCurrentItem(current);
+		this.getInventory().getMain().setCurrentItem(current);
 		getParent().getWorld().createAndSpawnEntity(getHeadPosition().add(0.0, 0.4, 0.0), control);
 	}
-	
+
 	/**
 	 * Rolls the credits located on the client.
 	 */
 	public void rollCredits() {
 		owner.getSession().send(new ChangeGameStateMessage(ChangeGameStateMessage.ENTER_CREDITS));
+	}
+
+	/**
+	 * Gets the currently active {@link Window}.
+	 * @return active window
+	 */
+	public Window getActiveWindow() {
+		return activeWindow;
+	}
+
+	/**
+	 * Sets the currently active {@link Window}.
+	 * @param window to set as active
+	 */
+	public void setActiveWindow(Window window) {
+		activeWindow = window;
+	}
+
+	/**
+	 * Gets the final {@link DefaultWindow} of the player.
+	 * @return default window of the player
+	 */
+	public DefaultWindow getDefaultWindow() {
+		return defaultWindow;
+	}
+
+	/**
+	 * Opens a {@link Window} for the player.
+	 * @param window
+	 */
+	public void openWindow(Window window) {
+		window.open();
+	}
+
+	/**
+	 * Closes the active {@link Window} for the player.
+	 */
+	public void closeWindow() {
+		if (activeWindow != null) {
+			activeWindow.close();
+		}
 	}
 }

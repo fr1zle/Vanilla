@@ -1,7 +1,6 @@
 /*
- * This file is part of Vanilla.
+ * This file is part of Vanilla (http://www.spout.org/).
  *
- * Copyright (c) 2011-2012, VanillaDev <http://www.spout.org/>
  * Vanilla is licensed under the SpoutDev License Version 1.
  *
  * Vanilla is free software: you can redistribute it and/or modify
@@ -19,23 +18,20 @@
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License,
- * the MIT license and the SpoutDev License Version 1 along with this program.
+ * the MIT license and the SpoutDev license version 1 along with this program.
  * If not, see <http://www.gnu.org/licenses/> for the GNU Lesser General Public
  * License and see <http://www.spout.org/SpoutDevLicenseV1.txt> for the full license,
  * including the MIT license.
  */
-package org.spout.vanilla.window.block;
+package org.spout.vanilla.inventory.window.block;
 
-import org.spout.vanilla.controller.block.EnchantmentTable;
 import org.spout.vanilla.controller.living.player.VanillaPlayer;
-import org.spout.vanilla.util.SlotIndexMap;
-import org.spout.vanilla.window.TransactionWindow;
+import org.spout.vanilla.inventory.block.ChestInventory;
+import org.spout.vanilla.inventory.window.Window;
+import org.spout.vanilla.inventory.window.WindowType;
 
-public class EnchantmentTableWindow extends TransactionWindow {
-	private static final SlotIndexMap SLOTS = new SlotIndexMap("28-36, 19-27, 10-18, 1-9, 0");
-
-	public EnchantmentTableWindow(VanillaPlayer owner, EnchantmentTable table) {
-		super(4, "Enchant", owner, table);
-		this.setSlotIndexMap(SLOTS);
+public class ChestWindow extends Window<ChestInventory> {
+	public ChestWindow(ChestInventory container, VanillaPlayer owner) {
+		super(container, owner, WindowType.CHEST, container.getSize() > 27 ? "Large chest" : "Chest", container.getSize());
 	}
 }

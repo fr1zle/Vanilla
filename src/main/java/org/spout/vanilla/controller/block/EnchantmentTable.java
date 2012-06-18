@@ -26,20 +26,23 @@
  */
 package org.spout.vanilla.controller.block;
 
-import org.spout.vanilla.controller.TransactionWindowOwner;
+import org.spout.api.inventory.Inventory;
+
+import org.spout.vanilla.controller.Container;
+import org.spout.vanilla.controller.VanillaBlockController;
 import org.spout.vanilla.controller.VanillaControllerTypes;
+import org.spout.vanilla.controller.WindowController;
 import org.spout.vanilla.controller.living.player.VanillaPlayer;
 import org.spout.vanilla.inventory.block.EnchantmentTableInventory;
+import org.spout.vanilla.inventory.window.Window;
+import org.spout.vanilla.inventory.window.block.EnchantmentTableWindow;
 import org.spout.vanilla.material.VanillaMaterials;
-import org.spout.vanilla.window.Window;
-import org.spout.vanilla.window.block.EnchantmentTableWindow;
 
-public class EnchantmentTable extends VanillaWindowBlockController implements TransactionWindowOwner {
-	private final EnchantmentTableInventory inventory;
+public class EnchantmentTable extends WindowController implements Container {
+	private final EnchantmentTableInventory inventory = new EnchantmentTableInventory();
 
 	public EnchantmentTable() {
 		super(VanillaControllerTypes.ENCHANTMENT_TABLE, VanillaMaterials.ENCHANTMENT_TABLE);
-		inventory = new EnchantmentTableInventory();
 	}
 
 	@Override
@@ -52,12 +55,12 @@ public class EnchantmentTable extends VanillaWindowBlockController implements Tr
 	}
 
 	@Override
-	public EnchantmentTableInventory getInventory() {
-		return inventory;
+	public Window createWindow(VanillaPlayer player) {
+		return new EnchantmentTableWindow(inventory, player);
 	}
 
 	@Override
-	public Window createWindow(VanillaPlayer player) {
-		return new EnchantmentTableWindow(player, this);
+	public Inventory getInventory() {
+		return inventory;
 	}
 }

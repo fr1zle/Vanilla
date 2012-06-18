@@ -28,27 +28,26 @@ package org.spout.vanilla.controller.block;
 
 import org.spout.api.inventory.ItemStack;
 
-import org.spout.vanilla.controller.TransactionWindowOwner;
+import org.spout.vanilla.controller.Container;
+import org.spout.vanilla.controller.VanillaBlockController;
 import org.spout.vanilla.controller.VanillaControllerTypes;
+import org.spout.vanilla.controller.WindowController;
 import org.spout.vanilla.controller.living.player.VanillaPlayer;
 import org.spout.vanilla.inventory.block.FurnaceInventory;
+import org.spout.vanilla.inventory.window.Window;
+import org.spout.vanilla.inventory.window.block.FurnaceWindow;
 import org.spout.vanilla.material.Fuel;
 import org.spout.vanilla.material.TimedCraftable;
 import org.spout.vanilla.material.VanillaMaterials;
-import org.spout.vanilla.protocol.msg.ProgressBarMessage;
-import org.spout.vanilla.window.Window;
-import org.spout.vanilla.window.block.FurnaceWindow;
 
-import static org.spout.vanilla.util.VanillaNetworkUtil.sendPacket;
+public class Furnace extends WindowController implements Container {
+	private final FurnaceInventory inventory = new FurnaceInventory();
 
-public class Furnace extends VanillaWindowBlockController implements TransactionWindowOwner {
-	private final FurnaceInventory inventory;
 	private float burnTime = 0, burnIncrement = 0, burnStartTime = 0;
 	private float progress = 0, progressIncrement = 0, craftTime = 0;
 
 	public Furnace() {
 		super(VanillaControllerTypes.FURNACE, VanillaMaterials.FURNACE);
-		inventory = new FurnaceInventory(this);
 	}
 
 	@Override
@@ -120,17 +119,8 @@ public class Furnace extends VanillaWindowBlockController implements Transaction
 				inventory.setOutput(output.setAmount(outputAmount));
 			}
 
-			// Update viewers
-			for (VanillaPlayer player : this.getViewers()) {
-				int window = player.getActiveWindow().getInstanceId();
-				sendPacket(player.getPlayer(), new ProgressBarMessage(window, org.spout.vanilla.material.block.controlled.Furnace.FIRE_ICON, (int) burnIncrement), new ProgressBarMessage(window, org.spout.vanilla.material.block.controlled.Furnace.PROGRESS_ARROW, (int) progressIncrement));
-			}
+			// TODO: Update viewers
 		}
-	}
-
-	@Override
-	public FurnaceInventory getInventory() {
-		return inventory;
 	}
 
 	public void setBurnTime(int burnTime) {
@@ -155,6 +145,11 @@ public class Furnace extends VanillaWindowBlockController implements Transaction
 
 	@Override
 	public Window createWindow(VanillaPlayer player) {
-		return new FurnaceWindow(player, this);
+		return new FurnaceWindow(inventory, player);
+	}
+
+	@Override
+	public FurnaceInventory getInventory() {
+		return inventory;
 	}
 }

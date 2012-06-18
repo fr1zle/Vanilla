@@ -43,6 +43,7 @@ import org.spout.vanilla.controller.block.MovingBlock;
 import org.spout.vanilla.controller.block.MovingPiston;
 import org.spout.vanilla.controller.block.NoteBlock;
 import org.spout.vanilla.controller.block.Sign;
+import org.spout.vanilla.controller.living.Human;
 import org.spout.vanilla.controller.living.MobControllerType;
 import org.spout.vanilla.controller.living.creature.hostile.Blaze;
 import org.spout.vanilla.controller.living.creature.hostile.CaveSpider;
@@ -69,7 +70,6 @@ import org.spout.vanilla.controller.living.creature.passive.Squid;
 import org.spout.vanilla.controller.living.creature.passive.Villager;
 import org.spout.vanilla.controller.living.creature.util.IronGolem;
 import org.spout.vanilla.controller.living.creature.util.SnowGolem;
-import org.spout.vanilla.controller.living.Human;
 import org.spout.vanilla.controller.object.misc.EnderCrystal;
 import org.spout.vanilla.controller.object.misc.Lightning;
 import org.spout.vanilla.controller.object.misc.Painting;
@@ -174,6 +174,7 @@ public class VanillaControllerTypes {
 	public static final VanillaControllerType BREWING_STAND = new VanillaControllerType(-15, BrewingStand.class, "Brewing Stand");
 	public static final VanillaControllerType MOVING_BLOCK = new VanillaControllerType(-16, MovingBlock.class, "Moving Block");
 	public static final VanillaControllerType CRAFTING_TABLE = new VanillaControllerType(-17, CraftingTable.class, "Crafting Table");
+
 	private static final TIntObjectHashMap<VanillaControllerType> ID_LOOKUP = new TIntObjectHashMap<VanillaControllerType>();
 
 	public static VanillaControllerType getByID(int id) {

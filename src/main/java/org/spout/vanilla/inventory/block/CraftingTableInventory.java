@@ -27,14 +27,24 @@
 package org.spout.vanilla.inventory.block;
 
 import org.spout.api.inventory.Inventory;
-import org.spout.api.util.StringUtil;
+import org.spout.api.inventory.InventoryBase;
 
-import org.spout.vanilla.inventory.CraftingGrid;
+import org.spout.vanilla.controller.living.player.VanillaPlayer;
+import org.spout.vanilla.inventory.Convertable;
+import org.spout.vanilla.inventory.Parsable;
 import org.spout.vanilla.inventory.VanillaInventory;
+import org.spout.vanilla.inventory.player.MainInventory;
+import org.spout.vanilla.inventory.window.Window;
+import org.spout.vanilla.util.SlotIndexMap;
 
-public class CraftingTableInventory extends Inventory implements VanillaInventory, CraftingGrid {
-	private final int[] GRID_ARRAY = StringUtil.getIntArray("0-5, 7-9");
-	private static final int OUTPUT_SLOT = 6, ROW_SIZE = 3, COLUMN_SIZE = 3;
+/**
+ * Represents an inventory of a {@link org.spout.vanilla.material.block.controlled.CraftingTable}. This is not cached in any form.
+ */
+public class CraftingTableInventory extends Inventory implements Parsable, Convertable, VanillaInventory {
+	public static final SlotIndexMap MAIN_SLOTS = new SlotIndexMap("37-45, 28-36, 19-27, 10-18");
+	public static final SlotIndexMap SLOTS = new SlotIndexMap("7-9, 4-6, 1-3, 0");
+	public static final int MAIN_START = 9, MAIN_END = 46;
+	public static final int START = 0, END = 10;
 	private static final long serialVersionUID = 1L;
 
 	public CraftingTableInventory() {
@@ -42,27 +52,32 @@ public class CraftingTableInventory extends Inventory implements VanillaInventor
 	}
 
 	@Override
-	public int getOutputSlot() {
-		return OUTPUT_SLOT;
+	public Inventory parse(Window window, VanillaPlayer player, int slot) {
+		if (slot > MAIN_START && slot < MAIN_END) {
+			return player.getInventory().getMain();
+		} else if (slot >= START && slot < END) {
+			return this;
+		}
+		return null;
 	}
 
 	@Override
-	public int getRowSize() {
-		return ROW_SIZE;
+	public int convert(Window window, InventoryBase inventory, int i) {
+		if (inventory instanceof MainInventory) {
+			return MAIN_SLOTS.getSpoutSlot(i);
+		} else if (inventory instanceof CraftingTableInventory) {
+			return SLOTS.getSpoutSlot(i);
+		}
+		return -1;
 	}
 
 	@Override
-	public int getColumnSize() {
-		return COLUMN_SIZE;
-	}
-
-	@Override
-	public int[] getGridArray() {
-		return GRID_ARRAY;
-	}
-
-	@Override
-	public Inventory getGridInventory() {
-		return this;
+	public int revert(Window window, InventoryBase inventory, int i) {
+		if (inventory instanceof MainInventory) {
+			return MAIN_SLOTS.getMinecraftSlot(i);
+		} else if (inventory instanceof CraftingTableInventory) {
+			return SLOTS.getMinecraftSlot(i);
+		}
+		return -1;
 	}
 }

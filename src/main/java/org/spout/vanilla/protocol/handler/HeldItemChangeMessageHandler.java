@@ -44,7 +44,6 @@ public final class HeldItemChangeMessageHandler extends MessageHandler<HeldItemC
 		if (newSlot < 0 || newSlot > 8) {
 			return;
 		}
-
-		((VanillaPlayer) player.getEntity().getController()).getInventory().getQuickbar().setCurrentSlot(newSlot);
+		((VanillaPlayer) player.getEntity().getController()).getInventory().getMain().setCurrentSlot(newSlot);
 	}
 }

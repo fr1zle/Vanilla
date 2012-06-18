@@ -93,22 +93,12 @@ public class VanillaPlayerUtil {
 	}
 
 	/**
-	 * Tries to find the player selected inventory slot of the source
-	 * @param source
-	 * @return inventory slot that is selected
-	 */
-	public static InventorySlot getCurrentSlot(Source source) {
-		PlayerInventory inv = getInventory(source);
-		return inv == null ? null : inv.getQuickbar().getCurrentSlotInventory();
-	}
-
-	/**
 	 * Tries to find the currently active item (held item) from a player entity source
 	 * @param source
 	 * @return the held item, or null if not found
 	 */
 	public static ItemStack getCurrentItem(Source source) {
-		InventorySlot inv = getCurrentSlot(source);
-		return inv == null ? null : inv.getItem();
+		PlayerInventory inv = getInventory(source);
+		return inv == null ? null : inv.getMain().getCurrentItem();
 	}
 }

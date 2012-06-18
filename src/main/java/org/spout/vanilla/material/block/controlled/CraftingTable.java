@@ -28,8 +28,8 @@ package org.spout.vanilla.material.block.controlled;
 
 import java.util.ArrayList;
 
-import org.spout.api.entity.component.Controller;
 import org.spout.api.entity.Entity;
+import org.spout.api.entity.component.Controller;
 import org.spout.api.event.player.PlayerInteractEvent.Action;
 import org.spout.api.geo.cuboid.Block;
 import org.spout.api.inventory.ItemStack;
@@ -37,7 +37,10 @@ import org.spout.api.material.block.BlockFace;
 
 import org.spout.vanilla.controller.VanillaControllerTypes;
 import org.spout.vanilla.controller.living.player.VanillaPlayer;
+import org.spout.vanilla.inventory.block.CraftingTableInventory;
+import org.spout.vanilla.inventory.window.block.CraftingTableWindow;
 import org.spout.vanilla.material.Mineable;
+import org.spout.vanilla.material.block.Solid;
 import org.spout.vanilla.material.item.tool.Axe;
 import org.spout.vanilla.material.item.tool.Tool;
 import org.spout.vanilla.util.Instrument;
@@ -72,8 +75,6 @@ public class CraftingTable extends ControlledMaterial implements Mineable {
 			if (!(controller instanceof VanillaPlayer)) {
 				return;
 			}
-
-			// Open the crafting table
 			getController(block).open((VanillaPlayer) controller);
 		}
 	}

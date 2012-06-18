@@ -27,15 +27,24 @@
 package org.spout.vanilla.inventory.block;
 
 import org.spout.api.inventory.Inventory;
+import org.spout.api.inventory.InventoryBase;
 import org.spout.api.inventory.ItemStack;
 
+import org.spout.vanilla.controller.living.player.VanillaPlayer;
+import org.spout.vanilla.inventory.Convertable;
+import org.spout.vanilla.inventory.Parsable;
 import org.spout.vanilla.inventory.VanillaInventory;
+import org.spout.vanilla.inventory.player.MainInventory;
+import org.spout.vanilla.inventory.window.Window;
+import org.spout.vanilla.util.SlotIndexMap;
 
 /**
- * Represents a enchantment table inventory belonging to an enchantment table
- * controller.
+ * Represents the inventory of an {@link org.spout.vanilla.controller.block.EnchantmentTable}.
  */
-public class EnchantmentTableInventory extends Inventory implements VanillaInventory {
+public class EnchantmentTableInventory extends Inventory implements Parsable, Convertable, VanillaInventory {
+	public static final SlotIndexMap MAIN_SLOTS = new SlotIndexMap("28-36, 19-27, 10-18, 1-9");
+	public static final int MAIN_START = 0, MAIN_END = 37;
+	public static final int SLOT = 0;
 	private static final long serialVersionUID = 1L;
 
 	public EnchantmentTableInventory() {
@@ -51,11 +60,41 @@ public class EnchantmentTableInventory extends Inventory implements VanillaInven
 	}
 
 	/**
-	 * Returns the {@link ItemStack} in the enchantment slot (slot 36); can
+	 * Returns the {@link org.spout.api.inventory.ItemStack} in the enchantment slot (slot 36); can
 	 * return null.
 	 * @return ingredient item stack
 	 */
 	public ItemStack getItem() {
 		return getItem(0);
+	}
+
+	@Override
+	public Inventory parse(Window window, VanillaPlayer player, int slot) {
+		if (slot > MAIN_START && slot < MAIN_END) {
+			return player.getInventory().getMain();
+		} else if (slot == SLOT) {
+			return this;
+		}
+		return null;
+	}
+
+	@Override
+	public int convert(Window window, InventoryBase inventory, int i) {
+		if (inventory instanceof MainInventory) {
+			return MAIN_SLOTS.getSpoutSlot(i);
+		} else if (inventory instanceof EnchantmentTableInventory) {
+			return i;
+		}
+		return -1;
+	}
+
+	@Override
+	public int revert(Window window, InventoryBase inventory, int i) {
+		if (inventory instanceof MainInventory) {
+			return MAIN_SLOTS.getMinecraftSlot(i);
+		} else if (inventory instanceof EnchantmentTableInventory) {
+			return i;
+		}
+		return -1;
 	}
 }

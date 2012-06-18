@@ -32,6 +32,7 @@ import org.spout.api.inventory.ItemStack;
 import org.spout.api.material.Material;
 import org.spout.api.math.Vector3;
 
+import org.spout.vanilla.controller.Container;
 import org.spout.vanilla.controller.VanillaBlockController;
 import org.spout.vanilla.controller.VanillaControllerTypes;
 import org.spout.vanilla.controller.object.moving.Item;
@@ -43,12 +44,11 @@ import org.spout.vanilla.util.Music;
 
 import static org.spout.vanilla.util.VanillaNetworkUtil.playBlockEffect;
 
-public class Jukebox extends VanillaBlockController {
-	private final JukeboxInventory inventory;
+public class Jukebox extends VanillaBlockController implements Container {
+	private final JukeboxInventory inventory = new JukeboxInventory();
 
 	public Jukebox() {
 		super(VanillaControllerTypes.JUKEBOX, VanillaMaterials.JUKEBOX);
-		inventory = new JukeboxInventory();
 	}
 
 	@Override
@@ -107,6 +107,7 @@ public class Jukebox extends VanillaBlockController {
 		playBlockEffect(block, null, 48, PlayEffectMessage.Messages.MUSIC_DISC, music.getId());
 	}
 
+	@Override
 	public JukeboxInventory getInventory() {
 		return inventory;
 	}

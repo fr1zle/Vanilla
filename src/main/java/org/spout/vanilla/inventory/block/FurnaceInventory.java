@@ -27,35 +27,32 @@
 package org.spout.vanilla.inventory.block;
 
 import org.spout.api.inventory.Inventory;
+import org.spout.api.inventory.InventoryBase;
 import org.spout.api.inventory.ItemStack;
 
-import org.spout.vanilla.controller.block.Furnace;
+import org.spout.vanilla.controller.living.player.VanillaPlayer;
+import org.spout.vanilla.inventory.Convertable;
+import org.spout.vanilla.inventory.Parsable;
 import org.spout.vanilla.inventory.VanillaInventory;
+import org.spout.vanilla.inventory.player.MainInventory;
+import org.spout.vanilla.inventory.window.Window;
 import org.spout.vanilla.material.Fuel;
 import org.spout.vanilla.material.TimedCraftable;
+import org.spout.vanilla.util.SlotIndexMap;
 
-/**
- * Represents a furnace inventory belonging to a furnace controller.
- */
-public class FurnaceInventory extends Inventory implements VanillaInventory {
+public class FurnaceInventory extends Inventory implements Parsable, Convertable, VanillaInventory {
+	public static final SlotIndexMap MAIN_SLOTS = new SlotIndexMap("30-38, 21-29, 12-20, 3-11");
+	public static final SlotIndexMap SLOTS = new SlotIndexMap("1, 2, 0");
+	public static final int MAIN_START = 2, MAIN_END = 39;
+	public static final int START = 0, END = 3;
 	private static final long serialVersionUID = 1L;
-	private final Furnace owner;
 
-	public FurnaceInventory(Furnace owner) {
+	public FurnaceInventory() {
 		super(3);
-		this.owner = owner;
 	}
 
 	/**
-	 * Returns the furnace controller that this inventory belongs to.
-	 * @return owner the furnace controller
-	 */
-	public Furnace getOwner() {
-		return owner;
-	}
-
-	/**
-	 * Returns the {@link ItemStack} in the output slot (slot 37); can return null.
+	 * Returns the {@link org.spout.api.inventory.ItemStack} in the output slot (slot 37); can return null.
 	 * @return output item stack
 	 */
 	public ItemStack getOutput() {
@@ -116,5 +113,35 @@ public class FurnaceInventory extends Inventory implements VanillaInventory {
 	 */
 	public boolean hasIngredient() {
 		return getIngredient() != null && getIngredient().getMaterial() instanceof TimedCraftable;
+	}
+
+	@Override
+	public Inventory parse(Window window, VanillaPlayer player, int slot) {
+		if (slot > MAIN_START && slot < MAIN_END) {
+			return player.getInventory().getMain();
+		} else if (slot >= START && slot < END) {
+			return this;
+		}
+		return null;
+	}
+
+	@Override
+	public int convert(Window window, InventoryBase inventory, int i) {
+		if (inventory instanceof MainInventory) {
+			return MAIN_SLOTS.getSpoutSlot(i);
+		} else if (inventory instanceof FurnaceInventory) {
+			return SLOTS.getSpoutSlot(i);
+		}
+		return -1;
+	}
+
+	@Override
+	public int revert(Window window, InventoryBase inventory, int i) {
+		if (inventory instanceof MainInventory) {
+			return MAIN_SLOTS.getSpoutSlot(i);
+		} else if (inventory instanceof FurnaceInventory) {
+			return SLOTS.getSpoutSlot(i);
+		}
+		return -1;
 	}
 }

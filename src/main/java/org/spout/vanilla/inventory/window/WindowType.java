@@ -24,15 +24,49 @@
  * License and see <http://www.spout.org/SpoutDevLicenseV1.txt> for the full license,
  * including the MIT license.
  */
-package org.spout.vanilla.controller;
+package org.spout.vanilla.inventory.window;
 
-import org.spout.api.inventory.InventoryBase;
+import java.util.HashMap;
+import java.util.Map;
 
-public interface TransactionWindowOwner extends WindowOwner {
+/**
+ * Represents a window type that is permitted to render on the Notchian client.
+ */
+public enum WindowType {
+	PLAYER(-1),
+	CHEST(0),
+	WORKBENCH(1),
+	FURNACE(2),
+	DISPENSER(3),
+	ENCHANTMENT_TABLE(4),
+	BREWING_STAND(5);
+	private final int id;
+	private static final Map<Integer, WindowType> idLookup = new HashMap<Integer, WindowType>();
+
+	static {
+		for (WindowType type : WindowType.values()) {
+			idLookup.put(type.getId(), type);
+		}
+	}
+
+	private WindowType(int id) {
+		this.id = id;
+	}
 
 	/**
-	 * Gets the inventory of this controller
-	 * @return The Inventory of this controller
+	 * Gets the id of the window type.
+	 * @return window type id
 	 */
-	public InventoryBase getInventory();
+	public int getId() {
+		return id;
+	}
+
+	/**
+	 * Gets a type by id.
+	 * @param id to lookup
+	 * @return window type of given id
+	 */
+	public static WindowType get(int id) {
+		return idLookup.get(id);
+	}
 }

@@ -27,30 +27,29 @@
 package org.spout.vanilla.controller.block;
 
 import org.spout.api.geo.cuboid.Block;
-import org.spout.api.geo.discrete.Point;
 import org.spout.api.inventory.ItemStack;
-import org.spout.api.math.Vector3;
 
-import org.spout.vanilla.controller.TransactionWindowOwner;
+import org.spout.vanilla.controller.Container;
 import org.spout.vanilla.controller.VanillaControllerTypes;
+import org.spout.vanilla.controller.WindowController;
 import org.spout.vanilla.controller.living.player.VanillaPlayer;
 import org.spout.vanilla.inventory.block.ChestInventory;
+import org.spout.vanilla.inventory.window.Window;
+import org.spout.vanilla.inventory.window.block.ChestWindow;
 import org.spout.vanilla.material.VanillaMaterials;
 import org.spout.vanilla.util.VanillaNetworkUtil;
-import org.spout.vanilla.window.Window;
-import org.spout.vanilla.window.block.ChestWindow;
 
-public class Chest extends VanillaWindowBlockController implements TransactionWindowOwner {
-	private final ChestInventory inventory;
+public class Chest extends WindowController implements Container {
+	private final ChestInventory inventory = new ChestInventory(isDouble() ? 27 * 2 : 27);
 	private boolean opened = false;
-	
+
 	public Chest() {
 		super(VanillaControllerTypes.CHEST, VanillaMaterials.CHEST);
-		inventory = new ChestInventory(this);
 	}
 
 	@Override
 	public void onAttached() {
+		System.out.print("Attached!");
 		if (this.data().containsKey("items")) {
 			this.inventory.setContents((ItemStack[]) this.data().get("items"));
 		}
@@ -59,18 +58,6 @@ public class Chest extends VanillaWindowBlockController implements TransactionWi
 	@Override
 	public void onSave() {
 		this.data().put("items", this.inventory.getContents());
-	}
-
-	@Override
-	public void onTick(float dt) {
-		if (this.hasViewers()) {
-			Point position = this.getBlock().getPosition();
-			for (VanillaPlayer player : this.getViewerArray()) {
-				if (player.getParent().getPosition().distanceSquared(position) > 64) {
-					this.close(player);
-				}
-			}
-		}
 	}
 
 	@Override
@@ -91,7 +78,6 @@ public class Chest extends VanillaWindowBlockController implements TransactionWi
 		if (other == null) {
 			return null;
 		}
-
 		return VanillaMaterials.CHEST.getController(other);
 	}
 
@@ -105,16 +91,6 @@ public class Chest extends VanillaWindowBlockController implements TransactionWi
 
 	@Override
 	public Window createWindow(VanillaPlayer player) {
-		Chest other = this.getOtherHalf();
-		if (other != null) {
-			Vector3 offset = other.getParent().getPosition().subtract(this.getParent().getPosition());
-			if (offset.getX() > 0 || offset.getZ() > 0) {
-				return new ChestWindow(player, other, this);
-			} else {
-				return new ChestWindow(player, this, other);
-			}
-		} else {
-			return new ChestWindow(player, this);
-		}
+		return new ChestWindow(inventory, player);
 	}
 }

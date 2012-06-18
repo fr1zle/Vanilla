@@ -34,13 +34,17 @@ import org.spout.api.protocol.MessageHandler;
 import org.spout.api.protocol.Session;
 
 import org.spout.vanilla.controller.living.player.VanillaPlayer;
+import org.spout.vanilla.inventory.window.Window;
 import org.spout.vanilla.material.VanillaMaterials;
 import org.spout.vanilla.protocol.msg.CreativeMessage;
-import org.spout.vanilla.window.Window;
 
 public class CreativeMessageHandler extends MessageHandler<CreativeMessage> {
 	@Override
 	public void handleServer(Session session, Player player, CreativeMessage message) {
+		if (session == null || player == null || message == null) {
+			return;
+		}
+
 		Entity entity = player.getEntity();
 		if (!(entity.getController() instanceof VanillaPlayer)) {
 			return;
@@ -52,34 +56,25 @@ public class CreativeMessageHandler extends MessageHandler<CreativeMessage> {
 			return;
 		}
 
-		Window active = controller.getActiveWindow();
+		Window window = controller.getActiveWindow();
+		int slot = message.getSlot();
+		if (slot == -1) {
+			window.onOutsideClick();
+			return;
+		}
 
 		if (message.getId() == -1) {
-			//Taking item from existing slot
-			active.setItemOnCursor(null);
-			int slot = active.getSlotIndexMap().getSpoutSlot(message.getSlot());
-			if (slot != -1) {
-				active.onLeftClick(slot, false);
-			}
+			window.click(message.getSlot(), false, false);
 		} else {
 			Material material = VanillaMaterials.getMaterial(message.getId());
-			if (material != null && message.getDamage() != 0) {
-				material = material.getSubMaterial(message.getDamage());
-			}
 			if (material != null) {
-				ItemStack item = new ItemStack(material, message.getAmount());
-				if (message.getSlot() == -1) {
-					active.setItemOnCursor(item);
-					active.onOutsideClick();
-				} else {
-					int slot = active.getSlotIndexMap().getSpoutSlot(message.getSlot());
-					if (slot != -1) {
-						active.setItemOnCursor(null);
-						active.getInventory().setItem(slot, item);
-					}
+				short damage = message.getDamage();
+				if (damage != 0) {
+					material = material.getSubMaterial(damage);
 				}
-			} else {
-				player.kick("Unknown item ID: " + message.getId() + " and durability " + message.getDamage() + "!");
+				ItemStack cursor = new ItemStack(material, message.getAmount());
+				window.setItemOnCursor(cursor);
+				window.click(slot, false, false);
 			}
 		}
 	}

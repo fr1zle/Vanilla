@@ -26,14 +26,17 @@
  */
 package org.spout.vanilla.material.block.controlled;
 
+import org.spout.api.entity.component.Controller;
 import org.spout.api.geo.cuboid.Block;
+import org.spout.api.geo.discrete.Point;
+import org.spout.api.material.Placeable;
 import org.spout.api.material.block.BlockFace;
 
 import org.spout.vanilla.controller.VanillaControllerType;
 import org.spout.vanilla.material.block.Solid;
 
-public abstract class ControlledMaterial extends Solid {
-	private final VanillaControllerType type;
+public abstract class ControlledMaterial extends Solid implements Placeable {
+	protected final VanillaControllerType type;
 
 	public ControlledMaterial(VanillaControllerType type, String name, int id) {
 		super(name, id);

@@ -36,6 +36,7 @@ import org.spout.api.inventory.special.InventorySlot;
 import org.spout.api.material.BlockMaterial;
 import org.spout.api.material.block.BlockFace;
 
+import org.spout.vanilla.inventory.player.PlayerInventory;
 import org.spout.vanilla.material.VanillaMaterials;
 import org.spout.vanilla.material.block.Plant;
 import org.spout.vanilla.material.block.attachable.GroundAttachable;
@@ -73,12 +74,12 @@ public class WheatCrop extends GroundAttachable implements Plant {
 	@Override
 	public void onInteractBy(Entity entity, Block block, Action type, BlockFace clickedFace) {
 		super.onInteractBy(entity, block, type, clickedFace);
-		InventorySlot inv = VanillaPlayerUtil.getCurrentSlot(entity);
-		ItemStack current = inv.getItem();
+		PlayerInventory inv = VanillaPlayerUtil.getInventory(entity);
+		ItemStack current = inv.getMain().getCurrentItem();
 		if (current != null && current.getSubMaterial().equals(Dye.BONE_MEAL)) {
 			if (this.getGrowthStage(block) != 0x7) {
 				if (VanillaPlayerUtil.isSurvival(entity)) {
-					inv.addItemAmount(0, -1);
+					inv.getMain().addCurrentItemAmount(-1);
 				}
 				this.setGrowthStage(block, 0x7);
 			}

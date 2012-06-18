@@ -34,6 +34,7 @@ import org.spout.api.inventory.ItemStack;
 
 import org.spout.vanilla.controller.living.creature.passive.Sheep;
 import org.spout.vanilla.controller.object.moving.Item;
+import org.spout.vanilla.inventory.player.PlayerInventory;
 import org.spout.vanilla.material.VanillaMaterials;
 import org.spout.vanilla.material.item.tool.Tool;
 import org.spout.vanilla.util.VanillaPlayerUtil;
@@ -64,7 +65,8 @@ public class Shears extends Tool {
 			other.getWorld().createAndSpawnEntity(other.getPosition(), new Item(new ItemStack(VanillaMaterials.WOOL, col, rand.nextInt(3) + 1), other.getPosition().normalize()));
 
 			if (VanillaPlayerUtil.isSurvival(entity)) {
-				VanillaPlayerUtil.getCurrentSlot(entity).addItemData(0, 1);
+				PlayerInventory inv = VanillaPlayerUtil.getInventory(entity);
+				inv.getMain().addCurrentItemData(1);
 			}
 		}
 	}

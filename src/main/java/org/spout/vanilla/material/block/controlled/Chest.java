@@ -153,27 +153,25 @@ public class Chest extends ControlledMaterial implements Directional, Fuel, Mine
 
 	@Override
 	public boolean onPlacement(Block block, short data, BlockFace against, boolean isClickedBlock) {
-		if (super.onPlacement(block, data, against, isClickedBlock)) {
-			BlockFace facing = VanillaPlayerUtil.getFacing(block.getSource()).getOpposite();
-			//search for neighbor and align
-			Block neigh;
-			for (BlockFace face : BlockFaces.NESW) {
-				if ((neigh = block.translate(face)).getMaterial().equals(this)) {
-					if (face == facing || face == facing.getOpposite()) {
-						if (facing == BlockFace.NORTH || facing == BlockFace.SOUTH) {
-							facing = BlockFace.WEST;
-						} else {
-							facing = BlockFace.SOUTH;
-						}
+		super.onPlacement(block, data, against, isClickedBlock);
+		BlockFace facing = VanillaPlayerUtil.getFacing(block.getSource()).getOpposite();
+		//search for neighbor and align
+		Block neigh;
+		for (BlockFace face : BlockFaces.NESW) {
+			if ((neigh = block.translate(face)).getMaterial().equals(this)) {
+				if (face == facing || face == facing.getOpposite()) {
+					if (facing == BlockFace.NORTH || facing == BlockFace.SOUTH) {
+						facing = BlockFace.WEST;
+					} else {
+						facing = BlockFace.SOUTH;
 					}
-					this.setFacing(neigh, facing);
-					break;
 				}
+				this.setFacing(neigh, facing);
+				break;
 			}
-			this.setFacing(block, facing);
-			return true;
 		}
-		return false;
+		this.setFacing(block, facing);
+		return true;
 	}
 
 	@Override
@@ -183,9 +181,7 @@ public class Chest extends ControlledMaterial implements Directional, Fuel, Mine
 			if (!(controller instanceof VanillaPlayer)) {
 				return;
 			}
-
-			// Open the chest
-			this.getController(block).open((VanillaPlayer) controller);
+			getController(block).open((VanillaPlayer) controller);
 		}
 	}
 

@@ -24,29 +24,15 @@
  * License and see <http://www.spout.org/SpoutDevLicenseV1.txt> for the full license,
  * including the MIT license.
  */
-package org.spout.vanilla.window.block;
+package org.spout.vanilla.inventory.window.block;
 
-import org.spout.vanilla.controller.block.CraftingTable;
 import org.spout.vanilla.controller.living.player.VanillaPlayer;
-import org.spout.vanilla.inventory.block.CraftingTableInventory;
-import org.spout.vanilla.util.SlotIndexMap;
-import org.spout.vanilla.window.CraftingWindow;
+import org.spout.vanilla.inventory.block.BrewingStandInventory;
+import org.spout.vanilla.inventory.window.Window;
+import org.spout.vanilla.inventory.window.WindowType;
 
-public class CraftingTableWindow extends CraftingWindow {
-	private static final SlotIndexMap SLOTS = new SlotIndexMap("37-45, 28-36, 19-27, 10-18, 7-9, 4-6, 1-3, 0");
-
-	public CraftingTableWindow(VanillaPlayer owner, CraftingTable craftingTable) {
-		this(owner, craftingTable, new CraftingTableInventory());
-	}
-
-	private CraftingTableWindow(VanillaPlayer owner, CraftingTable craftingTable, CraftingTableInventory inventory) {
-		super(1, "Crafting", owner, inventory, craftingTable);
-		this.setInventory(owner.getInventory().getMain(), inventory);
-		this.setSlotIndexMap(SLOTS);
-	}
-
-	@Override
-	public int getInventorySize() {
-		return this.getInventory().getSize() - this.getOwner().getInventory().getMain().getSize();
+public class BrewingStandWindow extends Window<BrewingStandInventory> {
+	public BrewingStandWindow(BrewingStandInventory container, VanillaPlayer owner) {
+		super(container, owner, WindowType.BREWING_STAND, "Brewing", container.getSize());
 	}
 }

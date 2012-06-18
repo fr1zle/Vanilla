@@ -24,41 +24,22 @@
  * License and see <http://www.spout.org/SpoutDevLicenseV1.txt> for the full license,
  * including the MIT license.
  */
-package org.spout.vanilla.controller.block;
+package org.spout.vanilla.inventory;
 
-import org.spout.vanilla.controller.Container;
-import org.spout.vanilla.controller.VanillaBlockController;
-import org.spout.vanilla.controller.VanillaControllerTypes;
-import org.spout.vanilla.controller.WindowController;
+import org.spout.api.inventory.Inventory;
+
 import org.spout.vanilla.controller.living.player.VanillaPlayer;
-import org.spout.vanilla.inventory.block.BrewingStandInventory;
 import org.spout.vanilla.inventory.window.Window;
-import org.spout.vanilla.inventory.window.block.BrewingStandWindow;
-import org.spout.vanilla.material.VanillaMaterials;
 
-public class BrewingStand extends WindowController implements Container {
-	private final BrewingStandInventory inventory = new BrewingStandInventory();
-	private float brewTime = 0;
-
-	public BrewingStand() {
-		super(VanillaControllerTypes.BREWING_STAND, VanillaMaterials.BREWING_STAND_BLOCK);
-	}
-
-	public float getBrewTime() {
-		return this.brewTime;
-	}
-
-	@Override
-	public void onAttached() {
-	}
-
-	@Override
-	public Window createWindow(VanillaPlayer player) {
-		return new BrewingStandWindow(inventory, player);
-	}
-
-	@Override
-	public BrewingStandInventory getInventory() {
-		return inventory;
-	}
+/**
+ * Represents something that can return an inventory to store the item of a clicked slot in.
+ */
+public interface Parsable {
+	/**
+	 * This is used in {@link org.spout.vanilla.inventory.window.Window#click(int, boolean, boolean)} to get the inventory to handle the slot in.
+	 * @param player who clicked
+	 * @param clickedSlot of the window
+	 * @return inventory to handle
+	 */
+	public Inventory parse(Window window, VanillaPlayer player, int clickedSlot);
 }

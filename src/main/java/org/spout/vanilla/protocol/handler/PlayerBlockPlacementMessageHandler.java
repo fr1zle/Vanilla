@@ -44,6 +44,7 @@ import org.spout.api.protocol.MessageHandler;
 import org.spout.api.protocol.Session;
 
 import org.spout.vanilla.controller.living.player.VanillaPlayer;
+import org.spout.vanilla.inventory.player.MainInventory;
 import org.spout.vanilla.material.VanillaBlockMaterial;
 import org.spout.vanilla.material.item.tool.InteractTool;
 import org.spout.vanilla.protocol.msg.BlockChangeMessage;
@@ -56,9 +57,9 @@ public final class PlayerBlockPlacementMessageHandler extends MessageHandler<Pla
 		//refresh the client just in case it assumed something
 		player.getSession().send(new BlockChangeMessage(clickedBlock));
 		player.getSession().send(new BlockChangeMessage(alterBlock));
-		InventorySlot inv = VanillaPlayerUtil.getCurrentSlot(player.getEntity());
+		MainInventory inv = VanillaPlayerUtil.getInventory(player.getEntity()).getMain();
 		if (inv != null) {
-			inv.setItem(inv.getItem());
+			inv.setCurrentItem(inv.getCurrentItem());
 		}
 	}
 
@@ -66,8 +67,8 @@ public final class PlayerBlockPlacementMessageHandler extends MessageHandler<Pla
 	public void handleServer(Session session, Player player, PlayerBlockPlacementMessage message) {
 		EventManager eventManager = session.getEngine().getEventManager();
 		World world = player.getEntity().getWorld();
-		InventorySlot currentSlot = VanillaPlayerUtil.getCurrentSlot(player.getEntity());
-		ItemStack holding = currentSlot.getItem();
+		MainInventory inv = VanillaPlayerUtil.getInventory(player.getEntity()).getMain();
+		ItemStack holding = inv.getCurrentItem();
 		Material holdingMat = holding == null ? null : holding.getSubMaterial();
 
 		/*
@@ -80,8 +81,6 @@ public final class PlayerBlockPlacementMessageHandler extends MessageHandler<Pla
 		 * usually happens. Sometimes it doesn't happen like that. Therefore, a
 		 * hacky workaround.
 		 */
-
-		System.out.println(message.toString());
 
 		if (message.getDirection() == 255) {
 			// Right clicked air with an item.
@@ -105,7 +104,7 @@ public final class PlayerBlockPlacementMessageHandler extends MessageHandler<Pla
 			}
 
 			//Perform interaction event
-			PlayerInteractEvent interactEvent = eventManager.callEvent(new PlayerInteractEvent(player, clickedBlock.getPosition(), currentSlot.getItem(), Action.RIGHT_CLICK, false));
+			PlayerInteractEvent interactEvent = eventManager.callEvent(new PlayerInteractEvent(player, clickedBlock.getPosition(), holding, Action.RIGHT_CLICK, false));
 
 			//Get the target block and validate 
 			BlockMaterial clickedMaterial = clickedBlock.getMaterial();
@@ -122,7 +121,7 @@ public final class PlayerBlockPlacementMessageHandler extends MessageHandler<Pla
 			short durability = 0;
 
 			//perform interaction on the server
-			if (holdingMat != null) {
+			if (holdingMat != null && holdingMat instanceof Placeable) {
 				if (holdingMat instanceof InteractTool) {
 					durability = ((InteractTool) holdingMat).getMaxDurability();
 				}
@@ -132,10 +131,9 @@ public final class PlayerBlockPlacementMessageHandler extends MessageHandler<Pla
 
 			if (holdingMat instanceof InteractTool && VanillaPlayerUtil.isSurvival(clickedBlock.getSource())) { //TODO Total hack and is BADDDDDD
 				short newDurability = ((short) (durability - ((InteractTool) holdingMat).getMaxDurability()));
-
-				currentSlot.addItemData(0, newDurability);
+				inv.addCurrentItemData(newDurability);
 				if (((InteractTool) holdingMat).getMaxDurability() < 1 && durability != ((InteractTool) holdingMat).getMaxDurability()) { //TODO Total hack!!!
-					currentSlot.setItem(null); //Break a tool if their onInteract takes away durability. TODO Probably not the best place to do this...
+					inv.setCurrentItem(null);
 				}
 			}
 
@@ -196,7 +194,7 @@ public final class PlayerBlockPlacementMessageHandler extends MessageHandler<Pla
 				if (toPlace.onPlacement(target, placedData, targetFace, target == clickedBlock)) {
 					//Remove block from inventory if not in creative mode.
 					if (!((PlayerController) player.getEntity().getController()).hasInfiniteResources()) {
-						currentSlot.addItemAmount(0, -1);
+						inv.addCurrentItemAmount(-1);
 					}
 				} else {
 					undoPlacement(player, clickedBlock, alterBlock);

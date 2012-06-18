@@ -33,6 +33,7 @@ import org.spout.api.inventory.special.InventorySlot;
 import org.spout.api.material.source.DataSource;
 
 import org.spout.vanilla.controller.living.creature.passive.Sheep;
+import org.spout.vanilla.inventory.player.PlayerInventory;
 import org.spout.vanilla.material.block.solid.Wool.WoolColor;
 import org.spout.vanilla.material.item.VanillaItemMaterial;
 import org.spout.vanilla.util.VanillaPlayerUtil;
@@ -102,15 +103,15 @@ public class Dye extends VanillaItemMaterial {
 				return;
 			}
 
-			InventorySlot inv = VanillaPlayerUtil.getCurrentSlot(entity);
+			PlayerInventory inv = VanillaPlayerUtil.getInventory(entity);
 			if (inv != null) {
-				ItemStack holding = inv.getItem();
+				ItemStack holding = inv.getMain().getCurrentItem();
 				if (holding != null) {
 					//get color from holding item
 					((Sheep) other.getController()).setColor(WoolColor.getById((short) (0xF - holding.getData())));
 
 					if (VanillaPlayerUtil.isSurvival(entity)) {
-						inv.addItemAmount(0, -1);
+						inv.getMain().addCurrentItemAmount(-1);
 					}
 				}
 			}

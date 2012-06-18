@@ -42,6 +42,7 @@ import org.spout.api.protocol.MessageHandler;
 import org.spout.api.protocol.Session;
 
 import org.spout.vanilla.controller.living.player.VanillaPlayer;
+import org.spout.vanilla.inventory.player.PlayerInventory;
 import org.spout.vanilla.material.Mineable;
 import org.spout.vanilla.material.VanillaMaterial;
 import org.spout.vanilla.material.VanillaMaterials;
@@ -85,8 +86,8 @@ public final class PlayerDiggingMessageHandler extends MessageHandler<PlayerDigg
 			isInteractable = false;
 		}
 
-		InventorySlot currentSlot = VanillaPlayerUtil.getCurrentSlot(player.getEntity());
-		ItemStack heldItem = currentSlot.getItem();
+		PlayerInventory inv = ((VanillaPlayer) player.getEntity().getController()).getInventory();
+		ItemStack heldItem = inv.getMain().getCurrentItem();
 		VanillaPlayer vp = ((VanillaPlayer) player.getEntity().getController());
 
 		if (state == PlayerDiggingMessage.STATE_START_DIGGING) {
@@ -141,9 +142,9 @@ public final class PlayerDiggingMessageHandler extends MessageHandler<PlayerDigg
 					short penalty = ((Tool) heldItem.getMaterial()).getDurabilityPenalty((Mineable) blockMaterial.getMaterial(), heldItem);
 					if (penalty != 0) {
 						if (heldItem.getData() - penalty < 1) {
-							currentSlot.setItem(null);
+							inv.getMain().setCurrentItem(null);
 						} else {
-							currentSlot.addItemData(0, penalty);
+							inv.getMain().addCurrentItemData(penalty);
 						}
 					}
 				}
