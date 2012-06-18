@@ -30,6 +30,7 @@ import org.spout.api.inventory.InventoryBase;
 import org.spout.api.inventory.InventoryViewer;
 import org.spout.api.inventory.ItemStack;
 import org.spout.api.inventory.special.InventoryBundle;
+import org.spout.api.player.Player;
 import org.spout.api.player.PlayerController;
 
 import org.spout.vanilla.controller.living.player.VanillaPlayer;
@@ -46,13 +47,13 @@ public class Window implements InventoryViewer {
 	protected final int id;
 	protected final int instanceId;
 	protected String title;
-	protected final VanillaPlayer owner;
+	protected final Player owner;
 	protected InventoryBundle inventory;
 	protected ItemStack itemOnCursor;
 	protected SlotIndexMap slotIndexMap = DEFAULT_SLOTS;
 	protected boolean isOpen = false;
 
-	public Window(int id, String title, VanillaPlayer owner) {
+	public Window(int id, String title, Player owner) {
 		this.id = id;
 		this.title = title;
 		this.owner = owner;
@@ -97,11 +98,7 @@ public class Window implements InventoryViewer {
 		this.title = title;
 	}
 
-	public PlayerController getPlayer() {
-		return this.owner.getPlayer();
-	}
-
-	public VanillaPlayer getOwner() {
+	public Player getPlayer() {
 		return this.owner;
 	}
 
@@ -187,7 +184,7 @@ public class Window implements InventoryViewer {
 
 	public void dropItemOnCursor() {
 		if (this.hasItemOnCursor()) {
-			ItemUtil.dropItemNaturally(this.getOwner().getParent().getPosition(), this.getItemOnCursor());
+			ItemUtil.dropItemNaturally(getPlayer().getPosition(), this.getItemOnCursor());
 			this.setItemOnCursor(null);
 		}
 	}

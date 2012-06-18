@@ -41,7 +41,7 @@ import org.spout.api.inventory.InventoryBase;
 import org.spout.api.inventory.ItemStack;
 import org.spout.api.material.BlockMaterial;
 import org.spout.api.math.Quaternion;
-import org.spout.api.player.PlayerController;
+import org.spout.api.player.Player;
 import org.spout.api.protocol.EntityProtocol;
 import org.spout.api.protocol.Message;
 import org.spout.api.protocol.NetworkSynchronizer;
@@ -107,10 +107,10 @@ public class VanillaNetworkSynchronizer extends NetworkSynchronizer implements P
 		}
 	}
 
-	public VanillaNetworkSynchronizer(PlayerController player, Entity entity) {
-		super(player, player.getSession(), entity);
+	public VanillaNetworkSynchronizer(Player player) {
+		super(player);
 		registerProtocolEvents(this);
-		initChunk(player.getParent().getPosition());
+		initChunk(player.getPosition());
 	}
 
 	@Override
@@ -268,8 +268,8 @@ public class VanillaNetworkSynchronizer extends NetworkSynchronizer implements P
 	protected void sendPosition(Point p, Quaternion rot) {
 		//TODO: Implement Spout Protocol
 		Session session = owner.getSession();
-		if (p.distanceSquared(entity.getPosition()) >= 16) {
-			EntityTeleportMessage ETMMsg = new EntityTeleportMessage(entity.getId(), (int) p.getX(), (int) p.getY(), (int) p.getZ(), (int) rot.getYaw(), (int) rot.getPitch());
+		if (p.distanceSquared(owner.getPosition()) >= 16) {
+			EntityTeleportMessage ETMMsg = new EntityTeleportMessage(owner.getId(), (int) p.getX(), (int) p.getY(), (int) p.getZ(), (int) rot.getYaw(), (int) rot.getPitch());
 			PlayerLookMessage PLMsg = new PlayerLookMessage(rot.getYaw(), rot.getPitch(), true);
 			session.sendAll(ETMMsg, PLMsg);
 		} else {
@@ -289,8 +289,8 @@ public class VanillaNetworkSynchronizer extends NetworkSynchronizer implements P
 		//TODO Handle infinite height
 		if (first) {
 			first = false;
-			int entityId = owner.getParent().getId();
-			VanillaPlayer vc = (VanillaPlayer) owner.getParent().getController();
+			int entityId = owner.getId();
+			VanillaPlayer vc = (VanillaPlayer) owner.getController();
 			LoginRequestMessage idMsg = new LoginRequestMessage(entityId, owner.getName(), gamemode.getId(), dimension.getId(), difficulty.getId(), 256, session.getGame().getMaxPlayers(), worldType.getType());
 			owner.getSession().send(idMsg, true);
 			owner.getSession().setState(State.GAME);
@@ -403,7 +403,7 @@ public class VanillaNetworkSynchronizer extends NetworkSynchronizer implements P
 
 	@Override
 	public void onSlotSet(InventoryBase inventory, int slot, ItemStack item) {
-		Controller c = owner.getParent().getController();
+		Controller c = owner.getController();
 		if (!(c instanceof VanillaPlayer)) {
 			return;
 		}
@@ -426,7 +426,7 @@ public class VanillaNetworkSynchronizer extends NetworkSynchronizer implements P
 
 	@Override
 	public void updateAll(InventoryBase inventory, ItemStack[] slots) {
-		Controller c = owner.getParent().getController();
+		Controller c = owner.getController();
 		if (!(c instanceof VanillaPlayer)) {
 			return;
 		}

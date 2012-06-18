@@ -45,6 +45,7 @@ import org.spout.api.geo.cuboid.Region;
 import org.spout.api.inventory.InventoryBase;
 import org.spout.api.material.BlockMaterial;
 import org.spout.api.permissions.PermissionsSubject;
+import org.spout.api.player.Player;
 import org.spout.api.player.PlayerController;
 import org.spout.api.scheduler.TaskPriority;
 
@@ -73,16 +74,15 @@ public class VanillaListener implements Listener {
 	@EventHandler(order = Order.EARLIEST)
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		// Set their mode
-		PlayerController player = event.getPlayer();
-		Entity playerEntity = player.getParent();
-		player.setNetworkSynchronizer(new VanillaNetworkSynchronizer(player, playerEntity));
-		VanillaPlayer vanillaPlayer = new VanillaPlayer(player, playerEntity.getWorld().getDataMap().get(VanillaData.GAMEMODE));
+		Player player = event.getPlayer();
+		player.setNetworkSynchronizer(new VanillaNetworkSynchronizer(player));
+		VanillaPlayer vanillaPlayer = new VanillaPlayer(player.getWorld().getDataMap().get(VanillaData.GAMEMODE));
 
-		playerEntity.setController(vanillaPlayer, ControllerChangeReason.INITIALIZATION);
+		player.setController(vanillaPlayer, ControllerChangeReason.INITIALIZATION);
 
 		// Set protocol and send packets
 		if (vanillaPlayer.isSurvival()) {
-			VanillaNetworkUtil.sendPacket(vanillaPlayer.getPlayer(), new UpdateHealthMessage((short) vanillaPlayer.getHealth(), vanillaPlayer.getHunger(), vanillaPlayer.getFoodSaturation()));
+			VanillaNetworkUtil.sendPacket(vanillaPlayer.getParent(), new UpdateHealthMessage((short) vanillaPlayer.getHealth(), vanillaPlayer.getHunger(), vanillaPlayer.getFoodSaturation()));
 		}
 
 		// Make them visible to everyone by default
@@ -91,7 +91,7 @@ public class VanillaListener implements Listener {
 
 	@EventHandler(order = Order.LATEST)
 	public void onPlayerLeave(PlayerLeaveEvent event) {
-		InventoryBase inv = VanillaPlayerUtil.getInventory(event.getPlayer().getParent());
+		InventoryBase inv = VanillaPlayerUtil.getInventory(event.getPlayer());
 		if (inv != null) {
 			inv.removeViewer(event.getPlayer().getNetworkSynchronizer());
 		}
@@ -157,7 +157,7 @@ public class VanillaListener implements Listener {
 			VanillaPlayer sp = (VanillaPlayer) c;
 			short health = (short) sp.getHealth();
 			health += (short) event.getChange();
-			VanillaNetworkUtil.sendPacket(sp.getPlayer(), new UpdateHealthMessage(health, sp.getHunger(), sp.getFoodSaturation()));
+			VanillaNetworkUtil.sendPacket(sp.getParent(), new UpdateHealthMessage(health, sp.getHunger(), sp.getFoodSaturation()));
 		}
 	}
 }

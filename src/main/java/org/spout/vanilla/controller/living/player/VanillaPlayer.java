@@ -35,7 +35,6 @@ import org.spout.api.Spout;
 import org.spout.api.collision.BoundingBox;
 import org.spout.api.collision.CollisionModel;
 import org.spout.api.entity.Entity;
-import org.spout.api.entity.component.controller.PlayerController;
 import org.spout.api.geo.cuboid.Block;
 import org.spout.api.geo.discrete.Point;
 import org.spout.api.geo.discrete.Transform;
@@ -43,6 +42,7 @@ import org.spout.api.inventory.ItemStack;
 import org.spout.api.math.MathHelper;
 import org.spout.api.math.Quaternion;
 import org.spout.api.math.Vector3;
+import org.spout.api.player.Player;
 import org.spout.api.player.PlayerController;
 
 import org.spout.vanilla.configuration.VanillaConfiguration;
@@ -80,7 +80,6 @@ import static org.spout.vanilla.util.VanillaNetworkUtil.sendPacket;
  * Represents a player on a server with the VanillaPlugin; specific methods to Vanilla.
  */
 public class VanillaPlayer extends Human implements PlayerController {
-	protected final PlayerController owner;
 	protected long unresponsiveTicks = VanillaConfiguration.PLAYER_TIMEOUT_TICKS.getInt(), lastPing = 0, lastUserList = 0, foodTimer = 0;
 	protected short count = 0, ping, hunger = 20;
 	protected float foodSaturation = 5.0f, exhaustion = 0.0f;
@@ -92,7 +91,7 @@ public class VanillaPlayer extends Human implements PlayerController {
 	protected GameMode gameMode;
 	protected int distanceMoved, miningDamagePeriod = VanillaConfiguration.PLAYER_SPEEDMINING_PREVENTION_PERIOD.getInt(),
 			miningDamageAllowance = VanillaConfiguration.PLAYER_SPEEDMINING_PREVENTION_ALLOWANCE.getInt();
-	protected final Set<PlayerController> invisibleFor = new HashSet<PlayerController>();
+	protected final Set<Player> invisibleFor = new HashSet<Player>();
 	protected Point compassTarget;
 	protected Vector3 lookingAt;
 	protected Point diggingPosition;
@@ -109,11 +108,10 @@ public class VanillaPlayer extends Human implements PlayerController {
 	 * @param the {@link PlayerController} parent of the controller.
 	 * @param the {@link GameMode} of the player.
 	 */
-	public VanillaPlayer(PlayerController p, GameMode gameMode) {
+	public VanillaPlayer(GameMode gameMode) {
 		super(VanillaControllerTypes.PLAYER);
-		owner = p;
-		tabListName = owner.getName();
-		compassTarget = owner.getParent().getWorld().getSpawnPoint().getPosition();
+		tabListName = getParent().getName();
+		compassTarget = getParent().getWorld().getSpawnPoint().getPosition();
 		this.setHeadHeight(1.62f);
 		this.gameMode = gameMode;
 		miningDamage = new int[miningDamagePeriod];
@@ -123,10 +121,14 @@ public class VanillaPlayer extends Human implements PlayerController {
 	 * Constructs a new VanillaPlayer to use as a {@link PlayerController} for the given player.
 	 * @param the {@link PlayerController} parent of the controller.
 	 */
-	public VanillaPlayer(PlayerController p) {
-		this(p, GameMode.SURVIVAL);
+	public VanillaPlayer() {
+		this(GameMode.SURVIVAL);
 	}
 
+	@Override
+	public Player getParent() {
+		return (Player) getParent();
+	}
 	@Override
 	public boolean isSavable() {
 		return false; // Players are a special case, handled elsewhere
@@ -150,21 +152,16 @@ public class VanillaPlayer extends Human implements PlayerController {
 	public void onTick(float dt) {
 		super.onTick(dt);
 		if(playerDead) return;
-		
-		PlayerController player = getPlayer();
-		if (player == null || player.getSession() == null) {
-			return;
-		}
 
 		if (lastPing++ > VanillaConfiguration.PLAYER_TIMEOUT_TICKS.getInt() / 2) {
-			VanillaNetworkUtil.sendPacket(player, new KeepAliveMessage(getRandom().nextInt()));
+			VanillaNetworkUtil.sendPacket(getParent(), new KeepAliveMessage(getRandom().nextInt()));
 			lastPing = 0;
 		}
 
 		count++;
 		unresponsiveTicks--;
 		if (unresponsiveTicks == 0) {
-			player.kick("Connection Timeout!");
+			getParent().kick("Connection Timeout!");
 		}
 
 		if (lastUserList++ > 20) {
@@ -301,7 +298,7 @@ public class VanillaPlayer extends Human implements PlayerController {
 	public void setHealth(int health, Source source) {
 		super.setHealth(health, source);
 		playerDead = health <= 0;
-		sendPacket(owner, new UpdateHealthMessage((short) getHealth(), hunger, foodSaturation));
+		sendPacket(getParent(), new UpdateHealthMessage((short) getHealth(), hunger, foodSaturation));
 	}
 
 	@Override
@@ -316,18 +313,12 @@ public class VanillaPlayer extends Human implements PlayerController {
 	@Override
 	public void onDeath() {
 		// Don't count disconnects/unknown exceptions as dead (Yes that's a difference!)
-		if (owner.getSession() != null && owner.getSession().getPlayer() != null) {
+		if (getParent().getSession() != null && getParent().getSession().getPlayer() != null) {
 			super.onDeath();
 			playerDead = true;
 		}
 	}
 
-	@Override
-	public PlayerController getPlayer() {
-		return owner;
-	}
-
-	@Override
 	public boolean hasInfiniteResources() {
 		return gameMode.equals(GameMode.CREATIVE);
 	}
@@ -362,7 +353,7 @@ public class VanillaPlayer extends Human implements PlayerController {
 	 */
 	public void setCompassTarget(Point compassTarget) {
 		this.compassTarget = compassTarget;
-		sendPacket(owner, new SpawnPositionMessage(compassTarget.getBlockX(), compassTarget.getBlockY(), compassTarget.getBlockZ()));
+		sendPacket(getParent(), new SpawnPositionMessage(compassTarget.getBlockX(), compassTarget.getBlockY(), compassTarget.getBlockZ()));
 	}
 
 	/**
@@ -386,19 +377,19 @@ public class VanillaPlayer extends Human implements PlayerController {
 	 * @param visible
 	 * @param players
 	 */
-	public void setVisibleFor(boolean visible, PlayerController... players) {
+	public void setVisibleFor(boolean visible, Player... players) {
 		Entity parent = getParent();
-		for (PlayerController player : players) {
-			if (player.getParent().getController() != this) {
+		for (Player player : players) {
+			if (player.getController() != this) {
 				if (visible) {
 					invisibleFor.remove(player);
-					ItemStack currentItem = VanillaPlayerUtil.getCurrentItem(player.getParent());
+					ItemStack currentItem = VanillaPlayerUtil.getCurrentItem(player);
 					int itemId = 0;
 					if (currentItem != null) {
 						itemId = currentItem.getMaterial().getId();
 					}
 
-					sendPacket(player, new SpawnPlayerMessage(parent.getId(), owner.getName(), parent.getPosition(), (int) parent.getYaw(), (int) parent.getPitch(), itemId));
+					sendPacket(player, new SpawnPlayerMessage(parent.getId(), getParent().getName(), parent.getPosition(), (int) parent.getYaw(), (int) parent.getPitch(), itemId));
 				} else {
 					invisibleFor.add(player);
 					sendPacket(player, new DestroyEntityMessage(parent.getId()));
@@ -461,7 +452,7 @@ public class VanillaPlayer extends Human implements PlayerController {
 	 * @param op
 	 */
 	public void setOp(boolean op) {
-		String playerName = getPlayer().getName();
+		String playerName = getParent().getName();
 		VanillaConfiguration.OPS.setOp(playerName, op);
 	}
 
@@ -470,7 +461,7 @@ public class VanillaPlayer extends Human implements PlayerController {
 	 * @return true if an operator.
 	 */
 	public boolean isOp() {
-		String playerName = getPlayer().getName();
+		String playerName = getParent().getName();
 		return VanillaConfiguration.OPS.isOp(playerName);
 	}
 
@@ -504,7 +495,7 @@ public class VanillaPlayer extends Human implements PlayerController {
 	 */
 	public void setGameMode(GameMode gameMode) {
 		this.gameMode = gameMode;
-		sendPacket(owner, new ChangeGameStateMessage(ChangeGameStateMessage.CHANGE_GAME_MODE, gameMode));
+		sendPacket(getParent(), new ChangeGameStateMessage(ChangeGameStateMessage.CHANGE_GAME_MODE, gameMode));
 	}
 
 	/**
@@ -641,7 +632,7 @@ public class VanillaPlayer extends Human implements PlayerController {
 	 * @return true if successful
 	 */
 	public boolean startDigging(Point position) {
-		if (owner.getParent().getPosition().getDistance(position) > 6) { // TODO: Actually get block reach from somewhere instead of just using 6
+		if (getParent().getPosition().getDistance(position) > 6) { // TODO: Actually get block reach from somewhere instead of just using 6
 			return false;
 		}
 		isDigging = true;
@@ -742,7 +733,7 @@ public class VanillaPlayer extends Human implements PlayerController {
 	 * Rolls the credits located on the client.
 	 */
 	public void rollCredits() {
-		owner.getSession().send(new ChangeGameStateMessage(ChangeGameStateMessage.ENTER_CREDITS));
+		getParent().getSession().send(new ChangeGameStateMessage(ChangeGameStateMessage.ENTER_CREDITS));
 	}
 
 	/**
@@ -759,7 +750,7 @@ public class VanillaPlayer extends Human implements PlayerController {
 	 * @return true if already active
 	 */
 	public boolean addEffect(Effect effect) {
-		owner.getSession().send(new EntityEffectMessage(owner.getParent().getId(), effect.getType().getId(), effect.getStrength(), effect.getDuration()));
+		getParent().getSession().send(new EntityEffectMessage(getParent().getId(), effect.getType().getId(), effect.getStrength(), effect.getDuration()));
 		return effects.add(effect);
 	}
 
@@ -769,7 +760,7 @@ public class VanillaPlayer extends Human implements PlayerController {
 	 * @return true if effect is not active already
 	 */
 	public boolean removeEffect(Effect effect) {
-		owner.getSession().send(new EntityRemoveEffectMessage(owner.getParent().getId(), effect.getType().getId()));
+		getParent().getSession().send(new EntityRemoveEffectMessage(getParent().getId(), effect.getType().getId()));
 		return effects.remove(effect);
 	}
 }
