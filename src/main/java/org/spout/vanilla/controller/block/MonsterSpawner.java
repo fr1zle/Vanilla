@@ -34,7 +34,7 @@ import org.spout.api.geo.World;
 import org.spout.api.geo.cuboid.Block;
 import org.spout.api.geo.discrete.Point;
 import org.spout.api.math.Vector3;
-import org.spout.api.player.PlayerController;
+import org.spout.api.player.Player;
 
 import org.spout.vanilla.controller.VanillaBlockController;
 import org.spout.vanilla.controller.VanillaControllerType;
@@ -65,7 +65,7 @@ public class MonsterSpawner extends VanillaBlockController {
 	@Override
 	public void onTick(float dt) {
 		Block block = getBlock();
-		Set<PlayerController> nearbyPlayers = block.getWorld().getNearbyPlayers(block.getPosition(), range);
+		Set<Player> nearbyPlayers = block.getWorld().getNearbyPlayers(block.getPosition(), range);
 		if (nearbyPlayers == null || nearbyPlayers.isEmpty()) {
 			return;
 		}
@@ -140,7 +140,7 @@ public class MonsterSpawner extends VanillaBlockController {
 				case 5:
 					return VanillaControllerTypes.ZOMBIE;
 				case 6:
-					Set<PlayerController> nearbyPlayers = block.getWorld().getNearbyPlayers(block.getPosition(), 5);
+					Set<Player> nearbyPlayers = block.getWorld().getNearbyPlayers(block.getPosition(), 5);
 					if (nearbyPlayers == null || nearbyPlayers.isEmpty()) {
 						return VanillaControllerTypes.SILVERFISH;
 					}

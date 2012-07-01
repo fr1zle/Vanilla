@@ -26,7 +26,7 @@
  */
 package org.spout.vanilla.protocol.handler;
 
-import org.spout.api.player.PlayerController;
+import org.spout.api.player.Player;
 import org.spout.api.protocol.MessageHandler;
 import org.spout.api.protocol.Session;
 
@@ -35,14 +35,14 @@ import org.spout.vanilla.protocol.msg.GroundMessage;
 
 public class GroundMessageHandler extends MessageHandler<GroundMessage> {
 	@Override
-	public void handleServer(Session session, PlayerController player, GroundMessage message) {
-		if (player == null || player.getParent() == null || player.getParent().getController() == null) {
+	public void handleServer(Session session, Player player, GroundMessage message) {
+		if (player == null || player.getController() == null) {
 			return;
 		}
-		if (!(player.getParent().getController() instanceof VanillaPlayer)) {
+		if (!(player.getController() instanceof VanillaPlayer)) {
 			return;
 		}
-		VanillaPlayer vplayer = (VanillaPlayer) player.getParent().getController();
+		VanillaPlayer vplayer = (VanillaPlayer) player.getController();
 		vplayer.setOnGround(message.isOnGround());
 		//TODO check and apply fall damage!
 	}

@@ -27,11 +27,10 @@
 package org.spout.vanilla.controller.object.moving;
 
 import org.spout.api.collision.CollisionStrategy;
-import org.spout.api.entity.Entity;
 import org.spout.api.inventory.ItemStack;
 import org.spout.api.material.Material;
 import org.spout.api.math.Vector3;
-import org.spout.api.player.PlayerController;
+import org.spout.api.player.Player;
 
 import org.spout.vanilla.configuration.VanillaConfiguration;
 import org.spout.vanilla.controller.VanillaControllerTypes;
@@ -98,20 +97,19 @@ public class Item extends Substance {
 
 		super.onTick(dt);
 
-		PlayerController closestPlayer = getParent().getWorld().getNearestPlayer(getParent(), distance);
+		Player closestPlayer = getParent().getWorld().getNearestPlayer(getParent(), distance);
 		if (closestPlayer == null) {
 			return;
 		}
 
-		Entity entity = closestPlayer.getParent();
-		if (!(entity.getController() instanceof VanillaPlayer)) {
+		if (!(closestPlayer.getController() instanceof VanillaPlayer)) {
 			return;
 		}
 
 		int collected = getParent().getId();
-		int collector = entity.getId();
-		sendPacketsToNearbyPlayers(entity.getPosition(), entity.getViewDistance(), new CollectItemMessage(collected, collector));
-		((VanillaPlayer) entity.getController()).getInventory().getItems().addItem(is, true, true);
+		int collector = closestPlayer.getId();
+		sendPacketsToNearbyPlayers(closestPlayer.getPosition(), closestPlayer.getViewDistance(), new CollectItemMessage(collected, collector));
+		((VanillaPlayer) closestPlayer.getController()).getInventory().getItems().addItem(is, true, true);
 		getParent().kill();
 	}
 

@@ -48,6 +48,7 @@ import org.spout.api.geo.World;
 import org.spout.api.geo.cuboid.Block;
 import org.spout.api.geo.discrete.Point;
 import org.spout.api.math.Vector3;
+import org.spout.api.player.Player;
 import org.spout.api.player.PlayerController;
 
 import org.spout.vanilla.VanillaPlugin;
@@ -68,7 +69,7 @@ public class TestCommands {
 
 	@Command(aliases = {"explode"}, usage = "<explode>", desc = "Create an explosion")
 	public void explode(CommandContext args, CommandSource source) throws CommandException {
-		if (!(source instanceof PlayerController)) {
+		if (!(source instanceof Player)) {
 			throw new CommandException("You must be a player to cause an explosion");
 		}
 
@@ -80,12 +81,12 @@ public class TestCommands {
 
 	@Command(aliases = {"spawn"}, usage = "<spiral or disk> <number> <controller> ... <number> <controller>", desc = "Spawn up to 50 controllers!", min = 1, max = 10)
 	public void spawn(CommandContext args, CommandSource source) throws CommandException {
-		if (!(source instanceof PlayerController)) {
+		if (!(source instanceof Player)) {
 			throw new CommandException("You must be a player to spawn a controller");
 		}
 
-		PlayerController player = (PlayerController) source;
-		Point point = player.getParent().getPosition();
+		Player player = (Player) source;
+		Point point = player.getPosition();
 
 		boolean disk = false;
 
@@ -183,7 +184,7 @@ public class TestCommands {
 
 	@Command(aliases = {"control"}, usage = "<controller>", desc = "Control a controller!", min = 1, max = 6)
 	public void control(CommandContext args, CommandSource source) throws CommandException {
-		if (!(source instanceof PlayerController)) {
+		if (!(source instanceof Player)) {
 			throw new CommandException("You must be a player to search for and control a controller");
 		}
 
@@ -203,7 +204,7 @@ public class TestCommands {
 		/**
 		 * Find a valid controller to control
 		 */
-		Point point = ((PlayerController) source).getParent().getPosition();
+		Point point = ((Player) source).getPosition();
 		Set<Entity> entities = point.getWorld().getAll(type.getControllerClass());
 		Vector3 pos = null;
 		Entity found = null;
@@ -242,23 +243,23 @@ public class TestCommands {
 
 	@Command(aliases = {"tppos"}, usage = "<name> <world> <x> <y> <z>", desc = "Teleport to coordinates!", min = 5, max = 5)
 	public void tppos(CommandContext args, CommandSource source) throws CommandException {
-		PlayerController player = Spout.getEngine().getPlayer(args.getString(0), true);
-		if (!(source instanceof PlayerController) && player == null) {
+		Player player = Spout.getEngine().getPlayer(args.getString(0), true);
+		if (!(source instanceof Player) && player == null) {
 			throw new CommandException("Must specifiy a valid player to tppos from the console.");
 		}
 
 		World world = Spout.getEngine().getWorld(args.getString(1));
 		//If the source of the command is a player and they do not provide a valid player...teleport the source instead.
 		if (player == null) {
-			player = (PlayerController) source;
+			player = (Player) source;
 		}
 
 		if (world != null) {
 			Point loc = new Point(world, args.getInteger(2), args.getInteger(3), args.getInteger(4));
 			//Make sure the chunk the player is teleported to is loaded.
 			world.getChunkFromBlock(loc);
-			player.getParent().setPosition(loc);
-			player.getParent().getNetworkSynchronizer().setPositionDirty();
+			player.setPosition(loc);
+			player.getNetworkSynchronizer().setPositionDirty();
 		} else {
 			throw new CommandException("Please enter a valid world");
 		}
@@ -266,44 +267,43 @@ public class TestCommands {
 
 	@Command(aliases = {"block"}, desc = "Checks if the block below you has an entity", min = 0, max = 0)
 	public void checkBlock(CommandContext args, CommandSource source) throws CommandException {
-		if (!(source instanceof PlayerController)) {
+		if (!(source instanceof Player)) {
 			throw new CommandException("Source must be player");
 		}
 
-		PlayerController player = (PlayerController) source;
-		Entity playerEntity = player.getParent();
-		Block block = playerEntity.getWorld().getBlock(playerEntity.getPosition().subtract(0, 1, 0));
+		Player player = (Player) source;
+		Block block = player.getWorld().getBlock(player.getPosition().subtract(0, 1, 0));
 		if (!block.hasController()) {
-			player.getParent().sendMessage("Block has no entity!");
+			player.sendMessage("Block has no entity!");
 			return;
 		}
 
 		BlockController controller = block.getController();
-		player.getParent().sendMessage("Material: " + controller.getMaterial().getName());
+		player.sendMessage("Material: " + controller.getMaterial().getName());
 	}
 
 	@Command(aliases = {"vanish", "v"}, desc = "Toggle your visibility", min = 0, max = 0)
 	public void vanish(CommandContext args, CommandSource source) throws CommandException {
-		if (!(source instanceof PlayerController)) {
+		if (!(source instanceof Player)) {
 			throw new CommandException("Source must be player");
 		}
 
-		Controller controller = ((PlayerController) source).getParent().getController();
+		Controller controller = ((Player) source).getController();
 		if (!(controller instanceof VanillaPlayer)) {
 			throw new CommandException("Invalid controller");
 		}
 
 		VanillaPlayer vanillaPlayer = (VanillaPlayer) controller;
-		PlayerController player = vanillaPlayer.getPlayer();
+		Player player = (Player) source;
 		String name = player.getName();
 		if (invisible.contains(name)) {
 			invisible.remove(name);
 			vanillaPlayer.setVisible(true);
-			player.getParent().sendMessage("You re-appear");
+			player.sendMessage("You re-appear");
 		} else {
 			invisible.add(name);
 			vanillaPlayer.setVisible(false);
-			player.getParent().sendMessage("You vanish into thin air!");
+			player.sendMessage("You vanish into thin air!");
 		}
 	}
 
@@ -312,7 +312,7 @@ public class TestCommands {
 		World world = null;
 		boolean isConsole = false;
 
-		if (!(source instanceof PlayerController)) {
+		if (!(source instanceof Player)) {
 			if (args.length() == 0) {
 				throw new CommandException("Need to provide a world when executing from the console");
 			}
@@ -324,7 +324,7 @@ public class TestCommands {
 			throw new CommandException("World specified is not loaded");
 		}
 		if (world == null) {
-			world = ((PlayerController) source).getParent().getWorld();
+			world = ((Player) source).getWorld();
 		}
 		Set<Entity> entities = world.getAll();
 		int count = 0;
@@ -348,11 +348,11 @@ public class TestCommands {
 
 	@Command(aliases = "rollcredits", desc = "Rolls the end credits for the game.", min = 0, max = 0)
 	public void rollCredits(CommandContext args, CommandSource source) throws CommandException {
-		if (!(source instanceof PlayerController)) {
+		if (!(source instanceof Player)) {
 			throw new CommandException("You must be a player to view the credits.");
 		}
 
-		Controller controller = ((PlayerController) source).getParent().getController();
+		Controller controller = ((Player) source).getController();
 		if (controller instanceof VanillaPlayer) {
 			((VanillaPlayer) controller).rollCredits();
 		}
@@ -360,11 +360,11 @@ public class TestCommands {
 
 	@Command(aliases = "fx", desc = "Add an effect", min = 3, max = 3)
 	public void addEffect(CommandContext args, CommandSource source) throws CommandException {
-		if (!(source instanceof PlayerController)) {
+		if (!(source instanceof Player)) {
 			throw new CommandException("Only a player may add effects");
 		}
 
-		Controller controller = ((PlayerController) source).getParent().getController();
+		Controller controller = ((Player) source).getController();
 		if (controller instanceof VanillaPlayer) {
 			((VanillaPlayer) controller).addEffect(new Effect(Effect.Type.valueOf(args.getString(0).toUpperCase()), (byte) args.getInteger(1), (short) args.getInteger(2)));
 		}

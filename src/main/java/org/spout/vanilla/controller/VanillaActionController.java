@@ -37,7 +37,6 @@ import org.spout.api.collision.BoundingBox;
 import org.spout.api.collision.CollisionModel;
 import org.spout.api.collision.CollisionStrategy;
 import org.spout.api.entity.Entity;
-import org.spout.api.entity.component.controller.PlayerController;
 import org.spout.api.entity.component.controller.ActionController;
 import org.spout.api.event.entity.EntityHealthChangeEvent;
 import org.spout.api.geo.cuboid.Block;
@@ -46,6 +45,7 @@ import org.spout.api.math.MathHelper;
 import org.spout.api.math.Quaternion;
 import org.spout.api.math.Vector2;
 import org.spout.api.math.Vector3;
+import org.spout.api.player.PlayerController;
 
 import org.spout.vanilla.controller.object.moving.Item;
 import org.spout.vanilla.controller.source.DamageCause;

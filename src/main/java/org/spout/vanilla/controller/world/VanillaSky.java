@@ -31,7 +31,7 @@ import java.util.Random;
 
 import org.spout.api.entity.component.controller.BasicController;
 import org.spout.api.geo.World;
-import org.spout.api.player.PlayerController;
+import org.spout.api.player.Player;
 import org.spout.api.protocol.Message;
 
 import org.spout.vanilla.controller.VanillaController;
@@ -77,11 +77,11 @@ public abstract class VanillaSky extends BasicController implements VanillaContr
 	}
 
 	public void broadcastMessage(Message message) {
-		for (PlayerController player : world.getPlayers()) {
+		for (Player player : world.getPlayers()) {
 			if (!player.isOnline()) {
 				continue;
 			}
-			if (!player.getParent().getWorld().getName().equals(world.getName())) {
+			if (!player.getWorld().getName().equals(world.getName())) {
 				continue;
 			}
 			player.getSession().send(message);

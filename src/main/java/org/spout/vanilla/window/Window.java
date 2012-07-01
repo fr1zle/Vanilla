@@ -33,6 +33,7 @@ import org.spout.api.inventory.special.InventoryBundle;
 import org.spout.api.player.Player;
 import org.spout.api.player.PlayerController;
 
+import org.spout.vanilla.controller.living.player.VanillaPlayer;
 import org.spout.vanilla.protocol.msg.CloseWindowMessage;
 import org.spout.vanilla.protocol.msg.OpenWindowMessage;
 import org.spout.vanilla.util.InventoryUtil;
@@ -46,13 +47,13 @@ public class Window implements InventoryViewer {
 	protected final int id;
 	protected final int instanceId;
 	protected String title;
-	protected final Player owner;
+	protected final VanillaPlayer owner;
 	protected InventoryBundle inventory;
 	protected ItemStack itemOnCursor;
 	protected SlotIndexMap slotIndexMap = DEFAULT_SLOTS;
 	protected boolean isOpen = false;
 
-	public Window(int id, String title, Player owner) {
+	public Window(int id, String title, VanillaPlayer owner) {
 		this.id = id;
 		this.title = title;
 		this.owner = owner;
@@ -97,7 +98,7 @@ public class Window implements InventoryViewer {
 		this.title = title;
 	}
 
-	public Player getPlayer() {
+	public VanillaPlayer getOwner() {
 		return this.owner;
 	}
 
@@ -116,7 +117,7 @@ public class Window implements InventoryViewer {
 		if (this.isOpen()) {
 			return;
 		}
-		sendPacket(this.getPlayer(), new OpenWindowMessage(this.getInstanceId(), this.getId(), this.getTitle(), getInventorySize()));
+		sendPacket(this.getOwner().getParent(), new OpenWindowMessage(this.getInstanceId(), this.getId(), this.getTitle(), getInventorySize()));
 		//this.inventory.notifyViewers(this.inventory.getContents());
 		this.onOpened();
 		this.isOpen = true;
@@ -131,7 +132,7 @@ public class Window implements InventoryViewer {
 		}
 		this.isOpen = false;
 		if (this.hasCloseMessage()) {
-			sendPacket(this.getPlayer(), new CloseWindowMessage(this.getInstanceId()));
+			sendPacket(this.getOwner().getParent(), new CloseWindowMessage(this.getInstanceId()));
 		}
 		this.inventory.removeViewer(this);
 		this.inventory.stopWatching();
@@ -183,7 +184,7 @@ public class Window implements InventoryViewer {
 
 	public void dropItemOnCursor() {
 		if (this.hasItemOnCursor()) {
-			ItemUtil.dropItemNaturally(getPlayer().getPosition(), this.getItemOnCursor());
+			ItemUtil.dropItemNaturally(getOwner().getParent().getPosition(), this.getItemOnCursor());
 			this.setItemOnCursor(null);
 		}
 	}
@@ -329,11 +330,11 @@ public class Window implements InventoryViewer {
 
 	@Override
 	public void onSlotSet(InventoryBase inventory, int slot, ItemStack item) {
-		this.getPlayer().getNetworkSynchronizer().onSlotSet(inventory, slot, item);
+		this.getOwner().getParent().getNetworkSynchronizer().onSlotSet(inventory, slot, item);
 	}
 
 	@Override
 	public void updateAll(InventoryBase inventory, ItemStack[] slots) {
-		this.getPlayer().getNetworkSynchronizer().updateAll(inventory, slots);
+		this.getOwner().getParent().getNetworkSynchronizer().updateAll(inventory, slots);
 	}
 }

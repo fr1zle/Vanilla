@@ -121,7 +121,7 @@ public class Furnace extends VanillaBlockController {
 			// Update viewers
 			for (VanillaPlayer player : this.inventory.getViewingPlayers()) {
 				int window = player.getActiveWindow().getInstanceId();
-				sendPacket(player.getPlayer(), new ProgressBarMessage(window, org.spout.vanilla.material.block.controlled.Furnace.FIRE_ICON, (int) burnIncrement), new ProgressBarMessage(window, org.spout.vanilla.material.block.controlled.Furnace.PROGRESS_ARROW, (int) progressIncrement));
+				sendPacket(player.getParent(), new ProgressBarMessage(window, org.spout.vanilla.material.block.controlled.Furnace.FIRE_ICON, (int) burnIncrement), new ProgressBarMessage(window, org.spout.vanilla.material.block.controlled.Furnace.PROGRESS_ARROW, (int) progressIncrement));
 			}
 		}
 	}

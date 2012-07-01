@@ -26,9 +26,8 @@
  */
 package org.spout.vanilla.protocol.handler;
 
-import org.spout.api.entity.Entity;
 import org.spout.api.geo.discrete.Point;
-import org.spout.api.player.PlayerController;
+import org.spout.api.player.Player;
 import org.spout.api.protocol.MessageHandler;
 import org.spout.api.protocol.Session;
 
@@ -37,14 +36,8 @@ import org.spout.vanilla.protocol.msg.PlayerPositionMessage;
 
 public final class PlayerPositionMessageHandler extends MessageHandler<PlayerPositionMessage> {
 	@Override
-	public void handleServer(Session session, PlayerController player, PlayerPositionMessage message) {
+	public void handleServer(Session session, Player player, PlayerPositionMessage message) {
 		if (player == null) {
-			return;
-		}
-
-		Entity entity = player.getParent();
-
-		if (entity == null) {
 			return;
 		}
 
@@ -52,7 +45,7 @@ public final class PlayerPositionMessageHandler extends MessageHandler<PlayerPos
 		double y = message.getY();
 		double z = message.getZ();
 
-		Point ep = entity.getPosition();
+		Point ep = player.getPosition();
 		double dx = x - ep.getX();
 		double dy = y - ep.getY();
 		double dz = z - ep.getZ();
@@ -86,12 +79,12 @@ public final class PlayerPositionMessageHandler extends MessageHandler<PlayerPos
 		player.input().setHorizantal(diffInZ);
 		*/
 
-		Point p = new Point(entity.getWorld(), (float) x, (float) y, (float) z);
+		Point p = new Point(player.getWorld(), (float) x, (float) y, (float) z);
 		//Force the chunk to load if needed - if a player moves into an unloaded chunk they will die
-		entity.getWorld().getChunkFromBlock(p);
-		entity.setPosition(p);
+		player.getWorld().getChunkFromBlock(p);
+		player.setPosition(p);
 	}
 
-	public void handleClient(Session session, PlayerController player, PlayerPositionLookMessage message) {
+	public void handleClient(Session session, Player player, PlayerPositionLookMessage message) {
 	}
 }

@@ -28,7 +28,7 @@ package org.spout.vanilla.protocol.handler;
 
 import org.spout.api.Spout;
 import org.spout.api.geo.discrete.Point;
-import org.spout.api.player.PlayerController;
+import org.spout.api.player.Player;
 import org.spout.api.protocol.MessageHandler;
 import org.spout.api.protocol.Session;
 
@@ -42,8 +42,8 @@ import org.spout.vanilla.util.VanillaNetworkUtil;
 
 public class RespawnMessageHandler extends MessageHandler<RespawnMessage> {
 	@Override
-	public void handleServer(Session session, PlayerController player, RespawnMessage message) {
-		PlayerRespawnEvent event = new PlayerRespawnEvent(player.getParent(), player.getParent().getLastTransform().getPosition().getWorld().getSpawnPoint().getPosition());
+	public void handleServer(Session session, Player player, RespawnMessage message) {
+		PlayerRespawnEvent event = new PlayerRespawnEvent(player, player.getLastTransform().getPosition().getWorld().getSpawnPoint().getPosition());
 		Spout.getEngine().getEventManager().callEvent(event);
 
 		if (event.isCancelled()) {
@@ -52,22 +52,22 @@ public class RespawnMessageHandler extends MessageHandler<RespawnMessage> {
 
 		//Set position for the server
 		Point point = event.getPoint();
-		player.getParent().setPosition(point);
+		player.setPosition(point);
 		player.getNetworkSynchronizer().setPositionDirty();
-		VanillaPlayer controller = (VanillaPlayer) player.getParent().getController();
+		VanillaPlayer controller = (VanillaPlayer) player.getController();
 		controller.setHealth(controller.getMaxHealth(), HealthChangeReason.SPAWN);
 
 		//Send respawn packet back to the client.
 		//TODO We need worlds associated with vanilla storing characteristics
 		int dimension = point.getWorld().getDataMap().get(VanillaData.DIMENSION).getId();
 		byte difficulty = point.getWorld().getDataMap().get(VanillaData.DIFFICULTY).getId();
-		byte gamemode = ((VanillaPlayer) player.getParent().getController()).getGameMode().getId();
+		byte gamemode = controller.getGameMode().getId();
 		String worldType = point.getWorld().getDataMap().get(VanillaData.WORLD_TYPE).getType();
 		RespawnMessage respawn = new RespawnMessage(dimension, difficulty, gamemode, 256, worldType);
 		session.send(respawn);
 		
 		//send spawn to everyone else
-		SpawnPlayerMessage spawn = new SpawnPlayerMessage(player.getParent().getId(), player.getDisplayName(), point, (int) player.getParent().getYaw(), (int) player.getParent().getPitch(), 0);
-		VanillaNetworkUtil.broadcastPacket(new PlayerController[]{player}, spawn);
+		SpawnPlayerMessage spawn = new SpawnPlayerMessage(player.getId(), player.getDisplayName(), point, (int) player.getYaw(), (int) player.getPitch(), 0);
+		VanillaNetworkUtil.broadcastPacket(new Player[]{player}, spawn);
 	}
 }
