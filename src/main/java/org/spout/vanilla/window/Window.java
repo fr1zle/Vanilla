@@ -33,7 +33,6 @@ import org.spout.api.inventory.special.InventoryBundle;
 import org.spout.api.player.Player;
 import org.spout.api.player.PlayerController;
 
-import org.spout.vanilla.controller.living.player.VanillaPlayer;
 import org.spout.vanilla.protocol.msg.CloseWindowMessage;
 import org.spout.vanilla.protocol.msg.OpenWindowMessage;
 import org.spout.vanilla.util.InventoryUtil;

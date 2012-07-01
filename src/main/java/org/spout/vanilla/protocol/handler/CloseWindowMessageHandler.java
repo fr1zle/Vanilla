@@ -26,7 +26,7 @@
  */
 package org.spout.vanilla.protocol.handler;
 
-import org.spout.api.player.PlayerController;
+import org.spout.api.player.Player;
 import org.spout.api.protocol.MessageHandler;
 import org.spout.api.protocol.Session;
 
@@ -35,12 +35,12 @@ import org.spout.vanilla.protocol.msg.CloseWindowMessage;
 
 public final class CloseWindowMessageHandler extends MessageHandler<CloseWindowMessage> {
 	@Override
-	public void handleServer(Session session, PlayerController player, CloseWindowMessage message) {
+	public void handleServer(Session session, Player player, CloseWindowMessage message) {
 		if (session == null || player == null || message == null) {
 			return;
 		}
 
-		VanillaPlayer controller = (VanillaPlayer) player.getParent().getController();
+		VanillaPlayer controller = (VanillaPlayer) player.getController();
 		controller.closeWindow();
 
 		//TODO drop item, code below ;D

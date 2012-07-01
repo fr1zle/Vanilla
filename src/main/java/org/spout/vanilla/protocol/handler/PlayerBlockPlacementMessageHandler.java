@@ -26,7 +26,6 @@
  */
 package org.spout.vanilla.protocol.handler;
 
-import org.spout.api.entity.component.controller.PlayerController;
 import org.spout.api.event.EventManager;
 import org.spout.api.event.player.PlayerInteractEvent;
 import org.spout.api.event.player.PlayerInteractEvent.Action;
@@ -39,6 +38,7 @@ import org.spout.api.material.BlockMaterial;
 import org.spout.api.material.Material;
 import org.spout.api.material.Placeable;
 import org.spout.api.material.block.BlockFace;
+import org.spout.api.player.Player;
 import org.spout.api.player.PlayerController;
 import org.spout.api.protocol.MessageHandler;
 import org.spout.api.protocol.Session;
@@ -52,21 +52,21 @@ import org.spout.vanilla.util.VanillaMessageHandlerUtils;
 import org.spout.vanilla.util.VanillaPlayerUtil;
 
 public final class PlayerBlockPlacementMessageHandler extends MessageHandler<PlayerBlockPlacementMessage> {
-	private void undoPlacement(PlayerController player, Block clickedBlock, Block alterBlock) {
+	private void undoPlacement(Player player, Block clickedBlock, Block alterBlock) {
 		//refresh the client just in case it assumed something
 		player.getSession().send(new BlockChangeMessage(clickedBlock));
 		player.getSession().send(new BlockChangeMessage(alterBlock));
-		InventoryBase inv = VanillaPlayerUtil.getInventory(player.getParent());
+		InventoryBase inv = VanillaPlayerUtil.getInventory(player);
 		if (inv != null) {
 			inv.setCurrentItem(inv.getCurrentItem());
 		}
 	}
 
 	@Override
-	public void handleServer(Session session, PlayerController player, PlayerBlockPlacementMessage message) {
+	public void handleServer(Session session, Player player, PlayerBlockPlacementMessage message) {
 		EventManager eventManager = session.getGame().getEventManager();
-		World world = player.getParent().getWorld();
-		InventoryBase inventory = VanillaPlayerUtil.getInventory(player.getParent());
+		World world = player.getWorld();
+		InventoryBase inventory = VanillaPlayerUtil.getInventory(player);
 		ItemStack holding = inventory.getCurrentItem();
 		Material holdingMat = holding == null ? null : holding.getSubMaterial();
 
@@ -87,7 +87,7 @@ public final class PlayerBlockPlacementMessageHandler extends MessageHandler<Pla
 			// Right clicked air with an item.
 			PlayerInteractEvent event = eventManager.callEvent(new PlayerInteractEvent(player, null, holding, Action.RIGHT_CLICK, true));
 			if (!event.isCancelled() && holdingMat != null) {
-				holdingMat.onInteract(player.getParent(), Action.RIGHT_CLICK);
+				holdingMat.onInteract(player, Action.RIGHT_CLICK);
 			}
 		} else {
 
@@ -95,7 +95,7 @@ public final class PlayerBlockPlacementMessageHandler extends MessageHandler<Pla
 			//This is an anti-hack requirement (else hackers can load far-away chunks and crash the server)
 
 			//Get clicked block and validated face against it was placed
-			Block clickedBlock = world.getBlock(message.getX(), message.getY(), message.getZ(), player.getParent());
+			Block clickedBlock = world.getBlock(message.getX(), message.getY(), message.getZ(), player);
 			BlockFace clickedFace = VanillaMessageHandlerUtils.messageToBlockFace(message.getDirection());
 			if (clickedFace == BlockFace.THIS) {
 				return;
@@ -126,9 +126,9 @@ public final class PlayerBlockPlacementMessageHandler extends MessageHandler<Pla
 				if (holdingMat instanceof InteractTool) {
 					durability = ((InteractTool) holdingMat).getMaxDurability();
 				}
-				holdingMat.onInteract(player.getParent(), clickedBlock, Action.RIGHT_CLICK, clickedFace);
+				holdingMat.onInteract(player, clickedBlock, Action.RIGHT_CLICK, clickedFace);
 			}
-			clickedMaterial.onInteractBy(player.getParent(), clickedBlock, Action.RIGHT_CLICK, clickedFace);
+			clickedMaterial.onInteractBy(player, clickedBlock, Action.RIGHT_CLICK, clickedFace);
 
 			if (holdingMat instanceof InteractTool && VanillaPlayerUtil.isSurvival(clickedBlock.getSource())) { //TODO Total hack and is BADDDDDD
 				short newDurability = ((short) (durability - ((InteractTool) holdingMat).getMaxDurability()));
@@ -181,8 +181,8 @@ public final class PlayerBlockPlacementMessageHandler extends MessageHandler<Pla
 						//}
 
 						//For now: simple distance checking
-						Point pos1 = player.getParent().getPosition();
-						Point pos2 = ((VanillaPlayer) player.getParent().getController()).getHeadPosition();
+						Point pos1 = player.getPosition();
+						Point pos2 = ((VanillaPlayer) player.getController()).getHeadPosition();
 						Point tpos = target.getPosition();
 
 						if (pos1.distance(tpos) < 0.6 || pos2.distance(tpos) < 0.6) {
@@ -195,7 +195,7 @@ public final class PlayerBlockPlacementMessageHandler extends MessageHandler<Pla
 				//perform actual placement
 				if (toPlace.onPlacement(target, placedData, targetFace, target == clickedBlock)) {
 					//Remove block from inventory if not in creative mode.
-					if (!((PlayerController) player.getParent().getController()).hasInfiniteResources()) {
+					if (!((PlayerController) player.getController()).hasInfiniteResources()) {
 						if (inventory.getCurrentItem().getAmount() > 1) {
 							inventory.addCurrentItemAmount(-1);
 						} else {

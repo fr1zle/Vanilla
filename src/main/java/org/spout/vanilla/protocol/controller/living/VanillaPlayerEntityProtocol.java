@@ -29,7 +29,6 @@ package org.spout.vanilla.protocol.controller.living;
 import org.spout.api.entity.component.Controller;
 import org.spout.api.entity.Entity;
 import org.spout.api.inventory.ItemStack;
-import org.spout.api.protocol.EntityProtocol;
 import org.spout.api.protocol.Message;
 
 import org.spout.vanilla.controller.living.player.VanillaPlayer;
@@ -52,7 +51,7 @@ public class VanillaPlayerEntityProtocol extends VanillaEntityProtocol {
 
 		if (c instanceof VanillaPlayer) {
 			VanillaPlayer mcp = (VanillaPlayer) c;
-			String name = mcp.getPlayer().getName();
+			String name = mcp.getParent().getName();
 			int item = 0;
 			ItemStack hand = mcp.getInventory().getCurrentItem();
 			if (hand != null) {

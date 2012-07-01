@@ -29,7 +29,6 @@ package org.spout.vanilla.controller.world;
 import java.util.HashMap;
 import java.util.Random;
 
-import org.spout.api.entity.component.Controller;
 import org.spout.api.entity.component.controller.BasicController;
 import org.spout.api.geo.World;
 import org.spout.api.player.PlayerController;
