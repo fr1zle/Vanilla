@@ -35,10 +35,12 @@ import org.spout.vanilla.protocol.msg.EntityActionMessage;
 
 public final class AnimationMessageHandler extends MessageHandler<AnimationMessage> {
 	@Override
-	public void handleServer(Session session, Player player, AnimationMessage message) {
-		if (player == null) {
+	public void handleServer(Session session, AnimationMessage message) {
+		if (!session.hasPlayer()) {
 			return;
 		}
+
+		Player player = session.getPlayer();
 
 		switch (message.getAnimation()) {
 			case AnimationMessage.ANIMATION_CROUCH:

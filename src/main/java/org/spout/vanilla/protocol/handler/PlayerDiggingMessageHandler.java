@@ -57,10 +57,12 @@ import static org.spout.vanilla.util.VanillaNetworkUtil.sendPacketsToNearbyPlaye
 
 public final class PlayerDiggingMessageHandler extends MessageHandler<PlayerDiggingMessage> {
 	@Override
-	public void handleServer(Session session, Player player, PlayerDiggingMessage message) {
-		if (player == null) {
+	public void handleServer(Session session, PlayerDiggingMessage message) {
+		if (!session.hasPlayer()) {
 			return;
 		}
+
+		Player player = session.getPlayer();
 
 		int x = message.getX();
 		int y = message.getY();

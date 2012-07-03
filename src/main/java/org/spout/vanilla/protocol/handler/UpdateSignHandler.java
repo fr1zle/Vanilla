@@ -28,7 +28,6 @@ package org.spout.vanilla.protocol.handler;
 
 import org.spout.api.entity.component.controller.BlockController;
 import org.spout.api.geo.cuboid.Block;
-import org.spout.api.player.Player;
 import org.spout.api.protocol.MessageHandler;
 import org.spout.api.protocol.Session;
 
@@ -37,12 +36,12 @@ import org.spout.vanilla.protocol.msg.UpdateSignMessage;
 
 public class UpdateSignHandler extends MessageHandler<UpdateSignMessage> {
 	@Override
-	public void handleServer(Session session, Player player, UpdateSignMessage message) {
-		if (session == null || player == null || message == null) {
+	public void handleServer(Session session, UpdateSignMessage message) {
+		if (!session.hasPlayer()) {
 			return;
 		}
 
-		Block block = player.getWorld().getBlock(message.getX(), message.getY(), message.getZ());
+		Block block = session.getPlayer().getWorld().getBlock(message.getX(), message.getY(), message.getZ());
 		if (block == null) {
 			return;
 		}

@@ -26,8 +26,6 @@
  */
 package org.spout.vanilla.protocol.handler;
 
-import org.spout.api.entity.Entity;
-import org.spout.api.player.Player;
 import org.spout.api.protocol.MessageHandler;
 import org.spout.api.protocol.Session;
 
@@ -38,12 +36,12 @@ import org.spout.vanilla.window.Window;
 
 public final class WindowClickMessageHandler extends MessageHandler<WindowClickMessage> {
 	@Override
-	public void handleServer(Session session, Player player, WindowClickMessage message) {
-		if (!(player.getController() instanceof VanillaPlayer)) {
+	public void handleServer(Session session, WindowClickMessage message) {
+		if (!session.hasPlayer() || !(session.getPlayer().getController() instanceof VanillaPlayer)) {
 			return;
 		}
 
-		VanillaPlayer controller = (VanillaPlayer) player.getController();
+		VanillaPlayer controller = (VanillaPlayer) session.getPlayer().getController();
 		Window window = controller.getActiveWindow();
 		boolean result = false;
 		if (message.getSlot() == 64537) {

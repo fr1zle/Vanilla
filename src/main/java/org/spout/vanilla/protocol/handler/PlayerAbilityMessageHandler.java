@@ -26,7 +26,6 @@
  */
 package org.spout.vanilla.protocol.handler;
 
-import org.spout.api.player.Player;
 import org.spout.api.protocol.MessageHandler;
 import org.spout.api.protocol.Session;
 
@@ -36,15 +35,16 @@ import org.spout.vanilla.protocol.msg.PlayerAbilityMessage;
 
 public final class PlayerAbilityMessageHandler extends MessageHandler<PlayerAbilityMessage> {
 	@Override
-	public void handleServer(Session session, Player player, PlayerAbilityMessage message) {
-		if (player.getController() == null) {
+	public void handleServer(Session session, PlayerAbilityMessage message) {
+		if (!session.hasPlayer() || session.getPlayer().getController() == null) {
 			return;
 		}
-		if (!(player.getController() instanceof VanillaActionController)) {
+
+		if (!(session.getPlayer().getController() instanceof VanillaActionController)) {
 			return;
 		}
 		@SuppressWarnings("unused")
-		VanillaPlayer ve = (VanillaPlayer) player.getController();
+		VanillaPlayer ve = (VanillaPlayer) session.getPlayer().getController();
 
 		//TODO Implement this.
 	}

@@ -35,10 +35,12 @@ import org.spout.vanilla.protocol.msg.PlayerLookMessage;
 
 public final class PlayerLookMessageHandler extends MessageHandler<PlayerLookMessage> {
 	@Override
-	public void handleServer(Session session, Player player, PlayerLookMessage message) {
-		if (player == null) {
+	public void handleServer(Session session, PlayerLookMessage message) {
+		if (!session.hasPlayer()) {
 			return;
 		}
+
+		Player player = session.getPlayer();
 
 		player.setPitch(message.getPitch());
 		player.setYaw(-message.getYaw()); //cardinal direction adjustment

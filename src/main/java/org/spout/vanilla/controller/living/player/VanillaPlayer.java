@@ -108,10 +108,10 @@ public class VanillaPlayer extends Human implements PlayerController {
 	 * @param the {@link PlayerController} parent of the controller.
 	 * @param the {@link GameMode} of the player.
 	 */
-	public VanillaPlayer(GameMode gameMode) {
+	public VanillaPlayer(Player parent, GameMode gameMode) {
 		super(VanillaControllerTypes.PLAYER);
-		tabListName = getParent().getName();
-		compassTarget = getParent().getWorld().getSpawnPoint().getPosition();
+		tabListName = parent.getName();
+		compassTarget = parent.getWorld().getSpawnPoint().getPosition();
 		this.setHeadHeight(1.62f);
 		this.gameMode = gameMode;
 		miningDamage = new int[miningDamagePeriod];
@@ -121,13 +121,13 @@ public class VanillaPlayer extends Human implements PlayerController {
 	 * Constructs a new VanillaPlayer to use as a {@link PlayerController} for the given player.
 	 * @param the {@link PlayerController} parent of the controller.
 	 */
-	public VanillaPlayer() {
-		this(GameMode.SURVIVAL);
+	public VanillaPlayer(Player parent) {
+		this(parent, GameMode.SURVIVAL);
 	}
 
 	@Override
 	public Player getParent() {
-		return (Player) getParent();
+		return (Player) super.getParent();
 	}
 	@Override
 	public boolean isSavable() {

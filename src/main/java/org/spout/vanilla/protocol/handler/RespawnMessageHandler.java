@@ -42,7 +42,13 @@ import org.spout.vanilla.util.VanillaNetworkUtil;
 
 public class RespawnMessageHandler extends MessageHandler<RespawnMessage> {
 	@Override
-	public void handleServer(Session session, Player player, RespawnMessage message) {
+	public void handleServer(Session session, RespawnMessage message) {
+		if (!session.hasPlayer()) {
+			return;
+		}
+
+		Player player = session.getPlayer();
+
 		PlayerRespawnEvent event = new PlayerRespawnEvent(player, player.getLastTransform().getPosition().getWorld().getSpawnPoint().getPosition());
 		Spout.getEngine().getEventManager().callEvent(event);
 

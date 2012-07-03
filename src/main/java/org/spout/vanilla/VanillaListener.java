@@ -46,7 +46,6 @@ import org.spout.api.inventory.InventoryBase;
 import org.spout.api.material.BlockMaterial;
 import org.spout.api.permissions.PermissionsSubject;
 import org.spout.api.player.Player;
-import org.spout.api.player.PlayerController;
 import org.spout.api.scheduler.TaskPriority;
 
 import org.spout.vanilla.configuration.VanillaConfiguration;
@@ -76,7 +75,7 @@ public class VanillaListener implements Listener {
 		// Set their mode
 		Player player = event.getPlayer();
 		player.setNetworkSynchronizer(new VanillaNetworkSynchronizer(player));
-		VanillaPlayer vanillaPlayer = new VanillaPlayer(player.getWorld().getDataMap().get(VanillaData.GAMEMODE));
+		VanillaPlayer vanillaPlayer = new VanillaPlayer(player, player.getWorld().getDataMap().get(VanillaData.GAMEMODE));
 
 		player.setController(vanillaPlayer, ControllerChangeReason.INITIALIZATION);
 

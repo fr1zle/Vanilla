@@ -26,7 +26,6 @@
  */
 package org.spout.vanilla.protocol.handler;
 
-import org.spout.api.player.Player;
 import org.spout.api.protocol.MessageHandler;
 import org.spout.api.protocol.Session;
 
@@ -35,8 +34,8 @@ import org.spout.vanilla.protocol.msg.HeldItemChangeMessage;
 
 public final class HeldItemChangeMessageHandler extends MessageHandler<HeldItemChangeMessage> {
 	@Override
-	public void handleServer(Session session, Player player, HeldItemChangeMessage message) {
-		if (player == null) {
+	public void handleServer(Session session, HeldItemChangeMessage message) {
+		if (!session.hasPlayer()) {
 			return;
 		}
 
@@ -45,6 +44,6 @@ public final class HeldItemChangeMessageHandler extends MessageHandler<HeldItemC
 			return;
 		}
 
-		((VanillaPlayer) player.getController()).getInventory().setCurrentSlot(newSlot);
+		((VanillaPlayer) session.getPlayer().getController()).getInventory().setCurrentSlot(newSlot);
 	}
 }

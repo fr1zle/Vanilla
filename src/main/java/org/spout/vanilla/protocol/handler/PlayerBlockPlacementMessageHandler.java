@@ -39,7 +39,6 @@ import org.spout.api.material.Material;
 import org.spout.api.material.Placeable;
 import org.spout.api.material.block.BlockFace;
 import org.spout.api.player.Player;
-import org.spout.api.player.PlayerController;
 import org.spout.api.protocol.MessageHandler;
 import org.spout.api.protocol.Session;
 
@@ -63,7 +62,12 @@ public final class PlayerBlockPlacementMessageHandler extends MessageHandler<Pla
 	}
 
 	@Override
-	public void handleServer(Session session, Player player, PlayerBlockPlacementMessage message) {
+	public void handleServer(Session session, PlayerBlockPlacementMessage message) {
+		if (!session.hasPlayer()) {
+			return;
+		}
+
+		Player player = session.getPlayer();
 		EventManager eventManager = session.getGame().getEventManager();
 		World world = player.getWorld();
 		InventoryBase inventory = VanillaPlayerUtil.getInventory(player);

@@ -26,7 +26,6 @@
  */
 package org.spout.vanilla.protocol.handler;
 
-import org.spout.api.player.Player;
 import org.spout.api.protocol.MessageHandler;
 import org.spout.api.protocol.Session;
 
@@ -34,8 +33,8 @@ import org.spout.vanilla.protocol.msg.ChatMessage;
 
 public final class ChatMessageHandler extends MessageHandler<ChatMessage> {
 	@Override
-	public void handleServer(Session session, Player player, ChatMessage message) {
-		if (player == null) {
+	public void handleServer(Session session, ChatMessage message) {
+		if (!session.hasPlayer()) {
 			return;
 		}
 
@@ -45,7 +44,7 @@ public final class ChatMessageHandler extends MessageHandler<ChatMessage> {
 		if (text.length() > 100) {
 			session.disconnect("Chat message is too long.");
 		} else {
-			player.chat(text);
+			session.getPlayer().chat(text);
 		}
 	}
 }
