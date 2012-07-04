@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.spout.api.collision.CollisionStrategy;
 import org.spout.api.event.block.BlockChangeEvent;
 import org.spout.api.geo.cuboid.Block;
 import org.spout.api.inventory.ItemStack;
@@ -73,7 +72,7 @@ public abstract class VanillaBlockMaterial extends BlockMaterial implements Vani
 	public VanillaBlockMaterial(short dataMask, String name, int id) {
 		super(dataMask, name);
 		this.minecraftId = id;
-		this.setCollision(CollisionStrategy.NOCOLLIDE);
+		//this.setCollision(CollisionStrategy.NOCOLLIDE);
 		this.setTransparent();
 		this.setMiningLevel(0);
 		this.setMiningType(MiningType.PICKAXE);
@@ -83,7 +82,7 @@ public abstract class VanillaBlockMaterial extends BlockMaterial implements Vani
 	public VanillaBlockMaterial(String name, int id, int data, VanillaBlockMaterial parent) {
 		super(name, data, parent);
 		this.minecraftId = id;
-		this.setCollision(CollisionStrategy.NOCOLLIDE);
+		//this.setCollision(CollisionStrategy.NOCOLLIDE);
 		this.setTransparent();
 		this.setMiningLevel(0);
 		this.setMiningType(MiningType.PICKAXE);

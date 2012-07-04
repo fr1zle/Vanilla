@@ -33,9 +33,6 @@ import java.util.logging.Level;
 
 import org.spout.api.Source;
 import org.spout.api.Spout;
-import org.spout.api.collision.BoundingBox;
-import org.spout.api.collision.CollisionModel;
-import org.spout.api.collision.CollisionStrategy;
 import org.spout.api.entity.Entity;
 import org.spout.api.entity.component.Controller;
 import org.spout.api.entity.component.controller.PlayerController;
@@ -63,7 +60,7 @@ import static org.spout.vanilla.util.VanillaNetworkUtil.broadcastPacket;
  */
 public abstract class VanillaActionController extends Controller implements VanillaController {
 	private final VanillaControllerType type;
-	private final BoundingBox area = new BoundingBox(-0.3F, 0F, -0.3F, 0.3F, 0.8F, 0.3F);
+	//private final BoundingBox area = new BoundingBox(-0.3F, 0F, -0.3F, 0.3F, 0.8F, 0.3F);
 	private static Random rand = new Random();
 	// Controller flags
 	private boolean isFlammable = true;
@@ -91,8 +88,8 @@ public abstract class VanillaActionController extends Controller implements Vani
 
 	@Override
 	public void onAttached() {
-		getParent().setCollision(new CollisionModel(area));
-		getParent().getCollision().setStrategy(CollisionStrategy.SOLID);
+		//getParent().setCollision(new CollisionModel(area));
+		//getParent().getCollision().setStrategy(CollisionStrategy.SOLID);
 		data().put(Data.CONTROLLER_TYPE, getType().getID());
 
 		// Load data
@@ -186,9 +183,9 @@ public abstract class VanillaActionController extends Controller implements Vani
 		return type;
 	}
 
-	public BoundingBox getBounds() {
-		return this.area;
-	}
+	//public BoundingBox getBounds() {
+	//	return this.area;
+	//}
 
 	public boolean needsVelocityUpdate() {
 		return velocityTicks % 5 == 0;

@@ -30,8 +30,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.spout.api.Source;
-import org.spout.api.collision.BoundingBox;
-import org.spout.api.collision.CollisionModel;
 import org.spout.api.inventory.ItemStack;
 
 import org.spout.vanilla.controller.VanillaActionController;
@@ -58,7 +56,7 @@ public class Enderman extends Creature implements Neutral {
 			heldItem = data().get(Data.HELD_ITEM);
 		}
 		super.onAttached();
-		getParent().setCollision(new CollisionModel(new BoundingBox(1, 3, 1, 2, 3, 1)));
+		//getParent().setCollision(new CollisionModel(new BoundingBox(1, 3, 1, 2, 3, 1)));
 	}
 
 	@Override

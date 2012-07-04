@@ -26,7 +26,6 @@
  */
 package org.spout.vanilla.controller.object.moving;
 
-import org.spout.api.collision.CollisionStrategy;
 import org.spout.api.entity.Entity;
 import org.spout.api.inventory.ItemStack;
 import org.spout.api.material.Material;
@@ -73,7 +72,7 @@ public class Item extends Substance {
 	@Override
 	public void onAttached() {
 		super.onAttached();
-		getParent().getCollision().setStrategy(CollisionStrategy.SOFT);
+		//getParent().getCollision().setStrategy(CollisionStrategy.SOFT);
 		//registerAction(new GravityAction());
 		if (data().containsKey(Data.HELD_ITEM)) {
 			is = data().get(Data.HELD_ITEM).clone();

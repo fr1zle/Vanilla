@@ -90,7 +90,7 @@ public abstract class VanillaSky extends Controller implements VanillaController
 
 	@Override
 	public void onAttached() {
-		getParent().setCollision(null);
+		//getParent().setCollision(null);
 		simulator = new LightningSimulator(getParent().getWorld());
 	}
 
